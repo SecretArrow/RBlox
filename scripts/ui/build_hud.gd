@@ -22,15 +22,18 @@ var _paint_opt: OptionButton
 var _saveload: Control = null
 var _coding: Control = null
 
+
 func _ready() -> void:
 	layer = 10
-	_root = Control.new(); _root.name = "Root"
+	_root = Control.new()
+	_root.name = "Root"
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.theme = Settings.get_theme()
 	add_child(_root)
 	_build_bottom()
 	visible = false
+
 
 func _process(_delta: float) -> void:
 	if _bm == null or not is_instance_valid(_bm):
@@ -41,22 +44,30 @@ func _process(_delta: float) -> void:
 		if not on:
 			closed.emit()
 
+
 ## Buka mode build: tampilkan HUD + aktifkan BuildManager.
 func open() -> void:
-	visible = true; _call_bm("activate", [true])
+	visible = true
+	_call_bm("activate", [true])
+
 
 ## Tutup mode build: matikan BuildManager, sembunyikan, bebaskan HUD.
 func close() -> void:
-	_call_bm("activate", [false]); visible = false; closed.emit()
+	_call_bm("activate", [false])
+	visible = false
+	closed.emit()
+
 
 ## Terima kamera dari game.gd; diteruskan ke BuildManager bila didukung.
 func set_camera(cam: Camera3D) -> void:
 	if _bm != null and _bm.has_method("set_camera"):
 		_bm.call("set_camera", cam)
 
+
 ## Sambungkan tombol ke BuildManager.
 func bind_build_manager(bm: Node) -> void:
 	_bm = bm
+
 
 # ------------------------------------------------------------------ helpers
 func _btn(text: String, cb: Callable, size: Vector2 = BTN) -> Button:
@@ -67,21 +78,26 @@ func _btn(text: String, cb: Callable, size: Vector2 = BTN) -> Button:
 	b.pressed.connect(cb)
 	return b
 
+
 func _tool_btn(text: String, tool_name: String) -> Button:
 	var b := _btn(text, _on_tool.bind(tool_name))
-	b.toggle_mode = true; b.button_group = _tool_group
+	b.toggle_mode = true
+	b.button_group = _tool_group
 	return b
+
 
 ## Satu baris tombol: HBox di dalam HScrollContainer (scroll horizontal).
 func _row(parent: Control, h: float) -> HBoxContainer:
 	var sc := ScrollContainer.new()
 	sc.custom_minimum_size = Vector2(0, h)
 	sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	sc.mouse_filter = Control.MOUSE_FILTER_PASS; parent.add_child(sc)
+	sc.mouse_filter = Control.MOUSE_FILTER_PASS
+	parent.add_child(sc)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	sc.add_child(row)
 	return row
+
 
 func _opt(items: Array, cb: Callable, w: float) -> OptionButton:
 	var ob := OptionButton.new()
@@ -89,17 +105,22 @@ func _opt(items: Array, cb: Callable, w: float) -> OptionButton:
 		ob.add_item(str(it))
 	ob.custom_minimum_size = Vector2(w, BTN.y)
 	ob.focus_mode = Control.FOCUS_NONE
-	if cb.is_valid(): ob.item_selected.connect(cb)
+	if cb.is_valid():
+		ob.item_selected.connect(cb)
 	return ob
+
 
 func _build_bottom() -> void:
 	var panel := PanelContainer.new()
 	panel.name = "Toolbar"
 	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	panel.offset_left = 8.0; panel.offset_right = -8.0; panel.offset_bottom = -8.0
+	panel.offset_left = 8.0
+	panel.offset_right = -8.0
+	panel.offset_bottom = -8.0
 	_root.add_child(panel)
-	var col := VBoxContainer.new(); col.add_theme_constant_override("separation", 6)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 6)
 	panel.add_child(col)
 	var tools := _row(col, BTN.y + 8.0)
 	tools.add_child(_tool_btn(Locale.t("build_place"), "place"))
@@ -112,9 +133,11 @@ func _build_bottom() -> void:
 	tools.add_child(_paint_opt)
 	tools.add_child(_btn(Locale.t("terrain_paint"), _on_paint))
 	var sel := _row(col, BTN.y + 8.0)
-	_shape_opt = _opt(BlockLibrary.SHAPES, _on_shape, 130.0); _shape_opt.select(0)
+	_shape_opt = _opt(BlockLibrary.SHAPES, _on_shape, 130.0)
+	_shape_opt.select(0)
 	sel.add_child(_shape_opt)
-	_mat_opt = _opt(BlockLibrary.MATERIALS, _on_mat, 130.0); _mat_opt.select(0)
+	_mat_opt = _opt(BlockLibrary.MATERIALS, _on_mat, 130.0)
+	_mat_opt.select(0)
 	sel.add_child(_mat_opt)
 	_anchor_btn = _btn(Locale.t("build_anchor"), _on_anchor)
 	_anchor_btn.toggle_mode = true
@@ -130,6 +153,7 @@ func _build_bottom() -> void:
 		_style_swatch(sw, hex)
 		pal.add_child(sw)
 
+
 func _style_swatch(btn: Button, hex: String) -> void:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(hex) if Color.html_is_valid(hex) else Color.WHITE
@@ -142,20 +166,25 @@ func _style_swatch(btn: Button, hex: String) -> void:
 	for st in ["hover", "pressed", "focus"]:
 		btn.add_theme_stylebox_override(st, sbp)
 
+
 ## EN: paint names mirror Terrain.PAINTS (kept in sync here).
 func _paints() -> Array:
 	return ["grass", "dirt", "rock", "sand"]
 
+
 # ----------------------------------------------------------------- callbacks
+
 
 func _call_bm(method: String, args: Array = []) -> void:
 	if _bm != null and is_instance_valid(_bm) and _bm.has_method(method):
 		_bm.callv(method, args)
 
+
 func _on_tool(tool_name: String) -> void:
 	if _anchor_btn != null:
 		_anchor_btn.set_pressed_no_signal(false)
 	_call_bm("set_tool", [tool_name])
+
 
 func _on_anchor() -> void:
 	var on := _anchor_btn != null and _anchor_btn.button_pressed
@@ -164,16 +193,20 @@ func _on_anchor() -> void:
 	else:
 		_call_bm("set_tool", ["anchor" if on else "place"])
 
+
 func _on_shape(idx: int) -> void:
 	if idx >= 0 and idx < BlockLibrary.SHAPES.size():
 		_call_bm("set_shape", [BlockLibrary.SHAPES[idx]])
+
 
 func _on_mat(idx: int) -> void:
 	if idx >= 0 and idx < BlockLibrary.MATERIALS.size():
 		_call_bm("set_material", [BlockLibrary.MATERIALS[idx]])
 
+
 func _on_color(hex: String) -> void:
 	_call_bm("set_color", [hex])
+
 
 func _on_paint() -> void:
 	var idx := _paint_opt.selected if _paint_opt != null else -1
@@ -181,13 +214,17 @@ func _on_paint() -> void:
 	if idx >= 0 and idx < paints.size():
 		_call_bm("terrain_paint", [str(paints[idx])])
 
+
 func _selected_block() -> Node3D:
 	if _bm != null and _bm.has_method("get_selected_block"):
 		var n: Variant = _bm.call("get_selected_block")
-		if n is Node3D: return n
+		if n is Node3D:
+			return n
 	return null
 
+
 # -------------------------------------------------------------------- panels
+
 
 func _open_panel(path: String) -> Control:
 	if not ResourceLoader.exists(path):
@@ -199,12 +236,15 @@ func _open_panel(path: String) -> Control:
 	_root.add_child(panel)
 	return panel
 
+
 func _open_save_load() -> void:
-	if _saveload == null: _saveload = _open_panel(SAVELOAD_PATH)
+	if _saveload == null:
+		_saveload = _open_panel(SAVELOAD_PATH)
 	if _saveload == null:
 		_toast(Locale.t("error_not_impl"))
 		return
 	_saveload.open(_root)
+
 
 func _open_coding() -> void:
 	var target := _selected_block()
@@ -216,6 +256,7 @@ func _open_coding() -> void:
 		_toast(Locale.t("error_not_impl"))
 		return
 	_coding.open(_root, target)
+
 
 func _toast(msg: String) -> void:
 	if ResourceLoader.exists(TOAST_PATH):

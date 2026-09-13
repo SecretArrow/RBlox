@@ -70,7 +70,10 @@ func tick(delta: float) -> void:
 			if not is_instance_valid(z):
 				continue
 			var z3d := z as Node3D
-			if Vector2(z3d.global_position.x - ppos.x, z3d.global_position.z - ppos.z).length() < HIT_RANGE:
+			if (
+				Vector2(z3d.global_position.x - ppos.x, z3d.global_position.z - ppos.z).length()
+				< HIT_RANGE
+			):
 				_hit_cd = 0.9
 				damage_player(HIT_DAMAGE)
 				break

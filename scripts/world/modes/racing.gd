@@ -49,7 +49,10 @@ func tick(delta: float) -> void:
 		return
 	var pos := player_pos()
 	var target: Vector3 = _cps[_next]
-	if Vector2(pos.x - target.x, pos.z - target.z).length() < CP_RANGE and absf(pos.y - target.y) < 3.0:
+	if (
+		Vector2(pos.x - target.x, pos.z - target.z).length() < CP_RANGE
+		and absf(pos.y - target.y) < 3.0
+	):
 		_next += 1
 		if _next >= _cps.size():
 			_finished = true

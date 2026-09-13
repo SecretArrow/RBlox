@@ -93,6 +93,7 @@ func _physics_process(_delta: float) -> void:
 
 # ------------------------------------------------------------------ internal
 
+
 func _build_visuals() -> void:
 	var body_mi := MeshInstance3D.new()
 	var body_mesh := BoxMesh.new()
@@ -168,7 +169,13 @@ func _find_near_player() -> Node3D:
 	for n in get_tree().get_nodes_in_group("local_player"):
 		if n is Node3D and is_instance_valid(n):
 			var p3d := n as Node3D
-			var flat := Vector2(p3d.global_position.x - global_position.x, p3d.global_position.z - global_position.z).length()
+			var flat := (
+				Vector2(
+					p3d.global_position.x - global_position.x,
+					p3d.global_position.z - global_position.z
+				)
+				. length()
+			)
 			if flat < best_d and absf(p3d.global_position.y - global_position.y) < 3.0:
 				best_d = flat
 				best = p3d

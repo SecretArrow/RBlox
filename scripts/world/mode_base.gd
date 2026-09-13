@@ -63,6 +63,7 @@ func get_objective_text() -> String:
 
 # ------------------------------------------------------------------ helpers
 
+
 func player() -> Node:
 	for n in get_tree().get_nodes_in_group("local_player"):
 		if is_instance_valid(n):
@@ -166,7 +167,9 @@ func toast(msg: String) -> void:
 
 
 ## Visual ringan untuk prop JSON (checkpoint/fuse/star/bed/buypad/...).
-func prop_marker(pos: Vector3, color: String, size: Vector3 = Vector3(1, 1, 1), label: String = "") -> Node3D:
+func prop_marker(
+	pos: Vector3, color: String, size: Vector3 = Vector3(1, 1, 1), label: String = ""
+) -> Node3D:
 	var holder := Node3D.new()
 	holder.position = pos
 	var mi := MeshInstance3D.new()
@@ -210,6 +213,7 @@ func place_block(data: Dictionary) -> Node:
 
 
 # ------------------------------------------------------------------ internal
+
 
 func _grab_refs() -> void:
 	if game == null:

@@ -14,22 +14,50 @@ const TEMPLATES := [
 	{"id": "obby", "name_key": "tpl_obby", "desc_key": "tpl_obby_desc", "color": "#ff7043"},
 	{"id": "racing", "name_key": "tpl_racing", "desc_key": "tpl_racing_desc", "color": "#29b6f6"},
 	{"id": "city", "name_key": "tpl_city", "desc_key": "tpl_city_desc", "color": "#90a4ae"},
-	{"id": "survival", "name_key": "tpl_survival", "desc_key": "tpl_survival_desc", "color": "#66bb6a"},
+	{
+		"id": "survival",
+		"name_key": "tpl_survival",
+		"desc_key": "tpl_survival_desc",
+		"color": "#66bb6a"
+	},
 	{"id": "horror", "name_key": "tpl_horror", "desc_key": "tpl_horror_desc", "color": "#5c6bc0"},
-	{"id": "bedwars", "name_key": "tpl_bedwars", "desc_key": "tpl_bedwars_desc", "color": "#ef5350"},
-	{"id": "hide_seek", "name_key": "tpl_hide_seek", "desc_key": "tpl_hide_seek_desc", "color": "#ffb300"},
+	{
+		"id": "bedwars",
+		"name_key": "tpl_bedwars",
+		"desc_key": "tpl_bedwars_desc",
+		"color": "#ef5350"
+	},
+	{
+		"id": "hide_seek",
+		"name_key": "tpl_hide_seek",
+		"desc_key": "tpl_hide_seek_desc",
+		"color": "#ffb300"
+	},
 	{"id": "empty", "name_key": "tpl_empty", "desc_key": "tpl_empty_desc", "color": "#9e9e9e"},
-	{"id": "adventure", "name_key": "tpl_adventure", "desc_key": "tpl_adventure_desc", "color": "#26a69a"},
+	{
+		"id": "adventure",
+		"name_key": "tpl_adventure",
+		"desc_key": "tpl_adventure_desc",
+		"color": "#26a69a"
+	},
 	{"id": "tycoon", "name_key": "tpl_tycoon", "desc_key": "tpl_tycoon_desc", "color": "#ab47bc"},
 ]
 
 const CITY_COLORS := [
-	"#ef9a9a", "#90caf9", "#a5d6a7", "#fff59d",
-	"#ce93d8", "#ffcc80", "#80cbc4", "#b0bec5",
+	"#ef9a9a",
+	"#90caf9",
+	"#a5d6a7",
+	"#fff59d",
+	"#ce93d8",
+	"#ffcc80",
+	"#80cbc4",
+	"#b0bec5",
 ]
+
 
 static func catalog() -> Array:
 	return TEMPLATES.duplicate(true)
+
 
 ## JSON lengkap satu template; id tak dikenal jatuh ke "empty".
 static func build_world_json(id: String) -> Dictionary:
@@ -45,7 +73,8 @@ static func build_world_json(id: String) -> Dictionary:
 		"format": "rblox-world",
 		"version": VERSION,
 		"meta": {"name": _display_name(wid), "is_template": true},
-		"settings": {
+		"settings":
+		{
 			"game_mode": wid,
 			"day_night": true,
 			"cycle_minutes": 10.0,
@@ -81,7 +110,9 @@ static func build_world_json(id: String) -> Dictionary:
 			_build_tycoon(w)
 	return w
 
+
 # ------------------------------------------------------------------ builders
+
 
 static func _build_obby(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -97,14 +128,22 @@ static func _build_obby(w: Dictionary) -> void:
 		last = pos
 		_box(blocks, pos, Vector3(3, 0.5, 3), _hsl_color(rng), "plastic")
 		if (i + 1) % 6 == 0:
-			props.append({
-				"type": "checkpoint", "role": "obby", "index": cp,
-				"pos": _pvec(pos + Vector3(0, 0.8, 0)),
-			})
+			(
+				props
+				. append(
+					{
+						"type": "checkpoint",
+						"role": "obby",
+						"index": cp,
+						"pos": _pvec(pos + Vector3(0, 0.8, 0)),
+					}
+				)
+			)
 			cp += 1
 	# Platform akhir (finish neon)
 	_box(blocks, last + Vector3(0, 0.5, -6.0), Vector3(10, 1, 10), "#ffd54f", "neon")
 	_set_spawn(w, Vector3(0, 2.5, 10))
+
 
 static func _build_racing(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -124,13 +163,25 @@ static func _build_racing(w: Dictionary) -> void:
 	# Checkpoint 4 arah mata angin
 	for i in range(4):
 		var a := TAU * float(i) / 4.0
-		props.append({
-			"type": "checkpoint", "role": "racing", "index": i,
-			"pos": _pvec(Vector3(cos(a) * 26.0, 1.0, sin(a) * 17.0)),
-		})
-	props.append({"type": "kart", "role": "racing", "yaw": 90.0, "pos": _pvec(Vector3(24, 1.2, 2.5))})
-	props.append({"type": "kart", "role": "racing", "yaw": 90.0, "pos": _pvec(Vector3(24, 1.2, -2.5))})
+		(
+			props
+			. append(
+				{
+					"type": "checkpoint",
+					"role": "racing",
+					"index": i,
+					"pos": _pvec(Vector3(cos(a) * 26.0, 1.0, sin(a) * 17.0)),
+				}
+			)
+		)
+	props.append(
+		{"type": "kart", "role": "racing", "yaw": 90.0, "pos": _pvec(Vector3(24, 1.2, 2.5))}
+	)
+	props.append(
+		{"type": "kart", "role": "racing", "yaw": 90.0, "pos": _pvec(Vector3(24, 1.2, -2.5))}
+	)
 	_set_spawn(w, Vector3(28, 1.5, 0))
+
 
 static func _build_city(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -166,11 +217,18 @@ static func _build_city(w: Dictionary) -> void:
 	for sx in [-1.0, 1.0]:
 		for sz in [-1.0, 1.0]:
 			for off in [Vector2(4, 4), Vector2(-4, -4)]:
-				props.append({
-					"type": "streetlamp", "role": "city",
-					"pos": _pvec(Vector3(16.0 * sx + off.x, 0.5, 16.0 * sz + off.y)),
-				})
+				(
+					props
+					. append(
+						{
+							"type": "streetlamp",
+							"role": "city",
+							"pos": _pvec(Vector3(16.0 * sx + off.x, 0.5, 16.0 * sz + off.y)),
+						}
+					)
+				)
 	_set_spawn(w, Vector3(0, 2, 16))
+
 
 static func _build_survival(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -190,16 +248,29 @@ static func _build_survival(w: Dictionary) -> void:
 	props.append({"type": "campfire", "role": "survival", "pos": _pvec(Vector3(0, 0.5, 0))})
 	for i in range(6):
 		var sa := TAU * float(i) / 6.0
-		_box(blocks, Vector3(cos(sa) * 1.6, 0.25, sin(sa) * 1.6), Vector3(0.5, 0.5, 0.5), "#757575", "plastic")
+		_box(
+			blocks,
+			Vector3(cos(sa) * 1.6, 0.25, sin(sa) * 1.6),
+			Vector3(0.5, 0.5, 0.5),
+			"#757575",
+			"plastic"
+		)
 	# Spawner zombie mengelilingi arena
 	for i in range(5):
 		var za := TAU * float(i) / 5.0 + 0.4
-		props.append({
-			"type": "zombie_spawner", "role": "survival",
-			"pos": _pvec(Vector3(cos(za) * 26.0, 0.5, sin(za) * 26.0)),
-		})
+		(
+			props
+			. append(
+				{
+					"type": "zombie_spawner",
+					"role": "survival",
+					"pos": _pvec(Vector3(cos(za) * 26.0, 0.5, sin(za) * 26.0)),
+				}
+			)
+		)
 	w["settings"]["cycle_minutes"] = 6.0
 	_set_spawn(w, Vector3(0, 2, 5))
+
 
 static func _build_horror(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -219,8 +290,11 @@ static func _build_horror(w: Dictionary) -> void:
 		_box(blocks, Vector3(10, 1.5, z), Vector3(16, 3, 1), "#455a64", "plastic")
 	# 5 fuse tersebar + pintu keluar
 	var fuse_pos := [
-		Vector3(-14, 1, -14), Vector3(14, 1, -14), Vector3(-14, 1, 14),
-		Vector3(14, 1, 10), Vector3(0, 1, -14),
+		Vector3(-14, 1, -14),
+		Vector3(14, 1, -14),
+		Vector3(-14, 1, 14),
+		Vector3(14, 1, 10),
+		Vector3(0, 1, -14),
 	]
 	for i in range(fuse_pos.size()):
 		props.append({"type": "fuse", "role": "horror", "index": i, "pos": _pvec(fuse_pos[i])})
@@ -229,12 +303,15 @@ static func _build_horror(w: Dictionary) -> void:
 	w["settings"]["weather"] = "fog"
 	_set_spawn(w, Vector3(0, 2, 0))
 
+
 static func _build_bedwars(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
 	var props: Array = w["props"]
 	var teams := [
-		{"sx": 1.0, "sz": 1.0, "col": "#ef5350"}, {"sx": -1.0, "sz": 1.0, "col": "#29b6f6"},
-		{"sx": 1.0, "sz": -1.0, "col": "#66bb6a"}, {"sx": -1.0, "sz": -1.0, "col": "#ffee58"},
+		{"sx": 1.0, "sz": 1.0, "col": "#ef5350"},
+		{"sx": -1.0, "sz": 1.0, "col": "#29b6f6"},
+		{"sx": 1.0, "sz": -1.0, "col": "#66bb6a"},
+		{"sx": -1.0, "sz": -1.0, "col": "#ffee58"},
 	]
 	var spawns: Array = []
 	# Pulau tengah + generator utama
@@ -246,17 +323,32 @@ static func _build_bedwars(w: Dictionary) -> void:
 		var iz := 20.0 * float(t["sz"])
 		# Pulau tim + jembatan menuju tengah
 		_box(blocks, Vector3(ix, 0, iz), Vector3(8, 1, 8), String(t["col"]), "plastic")
-		_box(blocks, Vector3(10.5 * float(t["sx"]), 0.25, iz), Vector3(11, 0.5, 2), "#a1887f", "wood")
-		_box(blocks, Vector3(ix, 0.25, 10.5 * float(t["sz"])), Vector3(2, 0.5, 11), "#a1887f", "wood")
-		props.append({"type": "bed", "role": "bedwars", "team": i, "pos": _pvec(Vector3(ix, 0.6, iz))})
-		props.append({
-			"type": "generator", "role": "bedwars", "team": i,
-			"pos": _pvec(Vector3(ix + 3.0 * float(t["sx"]), 0.6, iz + 3.0 * float(t["sz"]))),
-		})
+		_box(
+			blocks, Vector3(10.5 * float(t["sx"]), 0.25, iz), Vector3(11, 0.5, 2), "#a1887f", "wood"
+		)
+		_box(
+			blocks, Vector3(ix, 0.25, 10.5 * float(t["sz"])), Vector3(2, 0.5, 11), "#a1887f", "wood"
+		)
+		props.append(
+			{"type": "bed", "role": "bedwars", "team": i, "pos": _pvec(Vector3(ix, 0.6, iz))}
+		)
+		(
+			props
+			. append(
+				{
+					"type": "generator",
+					"role": "bedwars",
+					"team": i,
+					"pos":
+					_pvec(Vector3(ix + 3.0 * float(t["sx"]), 0.6, iz + 3.0 * float(t["sz"]))),
+				}
+			)
+		)
 		spawns.append(_pvec(Vector3(ix, 2, iz)))
 	w["settings"]["day_night"] = false
 	w["spawn_points"] = spawns
 	w["settings"]["spawn"] = spawns[0]
+
 
 static func _build_hide_seek(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -277,11 +369,13 @@ static func _build_hide_seek(w: Dictionary) -> void:
 	w["settings"]["day_night"] = false
 	_set_spawn(w, Vector3(0, 2, 24))
 
+
 static func _build_empty(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
 	_box(blocks, Vector3(0, -0.5, 0), Vector3(64, 1, 64), "#8bc34a", "plastic")
 	w["settings"]["build_allowed"] = true
 	_set_spawn(w, Vector3(0, 2, 0))
+
 
 static func _build_adventure(w: Dictionary) -> void:
 	var props: Array = w["props"]
@@ -306,20 +400,34 @@ static func _build_adventure(w: Dictionary) -> void:
 	w["terrain"] = {"size": size, "seed": 20240, "heights": heights, "paint": paint}
 	# 10 bintang tersebar mengikuti tinggi bukit
 	var star_pos := [
-		Vector3(6, 0, -10), Vector3(-8, 0, -4), Vector3(10, 0, 2), Vector3(-4, 0, 10),
-		Vector3(0, 0, -16), Vector3(14, 0, 12), Vector3(-14, 0, 8), Vector3(4, 0, 18),
-		Vector3(-12, 0, -14), Vector3(8, 0, -6),
+		Vector3(6, 0, -10),
+		Vector3(-8, 0, -4),
+		Vector3(10, 0, 2),
+		Vector3(-4, 0, 10),
+		Vector3(0, 0, -16),
+		Vector3(14, 0, 12),
+		Vector3(-14, 0, 8),
+		Vector3(4, 0, 18),
+		Vector3(-12, 0, -14),
+		Vector3(8, 0, -6),
 	]
 	for i in range(star_pos.size()):
 		var sp: Vector3 = star_pos[i]
 		sp.y = _adv_height(sp.x, sp.z) + 1.2
 		props.append({"type": "star", "role": "adventure", "index": i, "pos": _pvec(sp)})
 	# Peti harta di puncak tengah
-	props.append({
-		"type": "chest", "role": "adventure",
-		"pos": _pvec(Vector3(0, _adv_height(0, 0) + 0.8, 0)),
-	})
+	(
+		props
+		. append(
+			{
+				"type": "chest",
+				"role": "adventure",
+				"pos": _pvec(Vector3(0, _adv_height(0, 0) + 0.8, 0)),
+			}
+		)
+	)
 	_set_spawn(w, Vector3(2, _adv_height(2, 2) + 2.0, 2))
+
 
 static func _build_tycoon(w: Dictionary) -> void:
 	var blocks: Array = w["blocks"]
@@ -332,13 +440,21 @@ static func _build_tycoon(w: Dictionary) -> void:
 	_box(blocks, Vector3(-14, 6.5, -14), Vector3(2.2, 0.4, 2.2), "#d1c4e9", "neon")
 	# Conveyor menuju tengah
 	for i in range(6):
-		_box(blocks, Vector3(-12.0 + float(i) * 2.0, 0.2, -14), Vector3(2, 0.4, 2), "#4dd0e1", "metal")
+		_box(
+			blocks,
+			Vector3(-12.0 + float(i) * 2.0, 0.2, -14),
+			Vector3(2, 0.4, 2),
+			"#4dd0e1",
+			"metal"
+		)
 	# Buypad penghasil uang
 	for off in [Vector3(8, 0.3, 8), Vector3(8, 0.3, -8), Vector3(-8, 0.3, 8), Vector3(-8, 0.3, -8)]:
 		props.append({"type": "buypad", "role": "tycoon", "pos": _pvec(off)})
 	_set_spawn(w, Vector3(18, 2, 18))
 
+
 # ------------------------------------------------------------------ helpers
+
 
 static func _display_name(id: String) -> String:
 	## Nama template via Locale (name_key) bila autoload hidup, fallback statis.
@@ -352,28 +468,46 @@ static func _display_name(id: String) -> String:
 				return s
 	return _title(id)
 
+
 static func _title(id: String) -> String:
 	var names := {
-		"obby": "Obby", "racing": "Racing", "city": "City", "survival": "Survival",
-		"horror": "Horror Maze", "bedwars": "Bed Wars", "hide_seek": "Hide and Seek",
-		"empty": "Empty World", "adventure": "Adventure", "tycoon": "Tycoon",
+		"obby": "Obby",
+		"racing": "Racing",
+		"city": "City",
+		"survival": "Survival",
+		"horror": "Horror Maze",
+		"bedwars": "Bed Wars",
+		"hide_seek": "Hide and Seek",
+		"empty": "Empty World",
+		"adventure": "Adventure",
+		"tycoon": "Tycoon",
 	}
 	return String(names.get(id, "Dunia"))
 
-static func _box(blocks: Array, pos: Vector3, size: Vector3, color: String, mat: String = "plastic") -> void:
-	blocks.append({
-		"id": "b%d" % blocks.size(),
-		"shape": "box",
-		"pos": _pvec(pos),
-		"size": _pvec(size),
-		"color": color,
-		"mat": mat,
-		"anchored": true,
-		"script": "",
-	})
+
+static func _box(
+	blocks: Array, pos: Vector3, size: Vector3, color: String, mat: String = "plastic"
+) -> void:
+	(
+		blocks
+		. append(
+			{
+				"id": "b%d" % blocks.size(),
+				"shape": "box",
+				"pos": _pvec(pos),
+				"size": _pvec(size),
+				"color": color,
+				"mat": mat,
+				"anchored": true,
+				"script": "",
+			}
+		)
+	)
+
 
 static func _pvec(v: Vector3) -> Array:
 	return [snappedf(v.x, 0.5), snappedf(v.y, 0.5), snappedf(v.z, 0.5)]
+
 
 static func _set_spawn(w: Dictionary, pos: Vector3) -> void:
 	var p := _pvec(pos)
@@ -381,13 +515,16 @@ static func _set_spawn(w: Dictionary, pos: Vector3) -> void:
 	settings["spawn"] = p
 	w["spawn_points"] = [p]
 
+
 static func _rng_for(id: String) -> RandomNumberGenerator:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("rblox-" + id)
 	return rng
 
+
 static func _hsl_color(rng: RandomNumberGenerator) -> String:
 	return "#" + Color.from_hsv(rng.randf(), 0.62, 0.85).to_html(false)
+
 
 static func _adv_height(wx: float, wz: float) -> float:
 	var h := 1.6 + 1.5 * sin(wx * 0.35) + 1.4 * cos(wz * 0.3) + 0.9 * sin((wx + wz) * 0.18)

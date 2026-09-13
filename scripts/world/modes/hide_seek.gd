@@ -21,12 +21,16 @@ func setup(p_world_json: Dictionary, game_node: Node) -> void:
 	var seekers := props_of("seeker")
 	if not seekers.is_empty():
 		spos = _vec3(seekers[0].get("pos"))
-	_seeker = spawn_npc("chase", spos, {
-		"speed": 4.0,
-		"always": true,
-		"name": Locale.t("npc_seeker"),
-		"color": "#ff7043",
-	})
+	_seeker = spawn_npc(
+		"chase",
+		spos,
+		{
+			"speed": 4.0,
+			"always": true,
+			"name": Locale.t("npc_seeker"),
+			"color": "#ff7043",
+		}
+	)
 	_stop_seeker()
 
 

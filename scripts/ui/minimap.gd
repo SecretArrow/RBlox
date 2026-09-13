@@ -57,7 +57,15 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 
 	# Penanda arah utara.
-	draw_string(font, Vector2(center.x - 8.0, 14.0), "N", HORIZONTAL_ALIGNMENT_CENTER, 16.0, 12, Color(1.0, 1.0, 1.0, 0.75))
+	draw_string(
+		font,
+		Vector2(center.x - 8.0, 14.0),
+		"N",
+		HORIZONTAL_ALIGNMENT_CENTER,
+		16.0,
+		12,
+		Color(1.0, 1.0, 1.0, 0.75)
+	)
 
 	# Spawn point dunia aktif (hijau).
 	var cw: Variant = GameState.current_world
@@ -67,11 +75,18 @@ func _draw() -> void:
 			for sp in spawns:
 				if sp is Array and sp.size() >= 3:
 					var p := _to_map(Vector3(float(sp[0]), float(sp[1]), float(sp[2])), cpos, ppm)
-					draw_rect(Rect2(p - Vector2(3.0, 3.0), Vector2(6.0, 6.0)), Color(0.3, 0.85, 0.4, 0.9), false, 1.5)
+					draw_rect(
+						Rect2(p - Vector2(3.0, 3.0), Vector2(6.0, 6.0)),
+						Color(0.3, 0.85, 0.4, 0.9),
+						false,
+						1.5
+					)
 
 	# NPC (merah) dan pemain remote (putih).
 	_draw_group(get_tree().get_nodes_in_group("npcs"), cpos, ppm, Color(0.95, 0.3, 0.3))
-	_draw_group(get_tree().get_nodes_in_group("remote_players"), cpos, ppm, Color(1.0, 1.0, 1.0, 0.95))
+	_draw_group(
+		get_tree().get_nodes_in_group("remote_players"), cpos, ppm, Color(1.0, 1.0, 1.0, 0.95)
+	)
 
 	# Player lokal: segitiga kuning menghadap yaw.
 	if _player != null:
@@ -100,5 +115,5 @@ func _draw_triangle(center: Vector2, yaw: float) -> void:
 
 func _to_map(world_pos: Vector3, cpos: Vector3, ppm: float) -> Vector2:
 	return Vector2(
-		size.x * 0.5 + (world_pos.x - cpos.x) * ppm,
-		size.y * 0.5 + (world_pos.z - cpos.z) * ppm)
+		size.x * 0.5 + (world_pos.x - cpos.x) * ppm, size.y * 0.5 + (world_pos.z - cpos.z) * ppm
+	)

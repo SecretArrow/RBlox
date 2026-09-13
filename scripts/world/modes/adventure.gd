@@ -5,7 +5,7 @@ extends "res://scripts/world/mode_base.gd"
 
 const PICK_RANGE := 2.0
 
-var _stars: Array = []          # [{pos: Vector3, hit: bool}]
+var _stars: Array = []  # [{pos: Vector3, hit: bool}]
 var _chest := Vector3.ZERO
 var _has_chest := false
 var _chest_open := false

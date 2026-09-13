@@ -80,6 +80,7 @@ func _process(_delta: float) -> void:
 
 # ------------------------------------------------------------- API facade
 
+
 func is_active() -> bool:
 	return _active
 
@@ -243,12 +244,17 @@ func list_lan_rooms(timeout: float = 1.5) -> Array:
 			if _rooms_has(out, rip):
 				continue
 			var d: Dictionary = parsed
-			out.append({
-				"name": String(d.get("name", "Room")),
-				"ip": rip,
-				"players": int(d.get("players", 1)),
-				"max": int(d.get("max", 16)),
-			})
+			(
+				out
+				. append(
+					{
+						"name": String(d.get("name", "Room")),
+						"ip": rip,
+						"players": int(d.get("players", 1)),
+						"max": int(d.get("max", 16)),
+					}
+				)
+			)
 		OS.delay_msec(50)
 	udp.close()
 	return out
@@ -381,6 +387,7 @@ func _rpc_kick_notify(reason: String) -> void:
 
 # --------------------------------------------------- sinyal multiplayer
 
+
 func _on_peer_connected(_id: int) -> void:
 	# Host menunggu _rpc_register_player dari peer; roster diupdate saat itu.
 	pass
@@ -423,6 +430,7 @@ func _on_server_disconnected() -> void:
 
 
 # ------------------------------------------------------------- internal
+
 
 func _server_lost() -> void:
 	var was_active := _active

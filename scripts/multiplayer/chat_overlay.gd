@@ -6,8 +6,16 @@ extends CanvasLayer
 const MAX_LINES := 8
 const INPUT_MAX_CHARS := 200
 const EMOTES: Array[String] = [
-	"Halo", "GG", "Siap!", "Tunggu", "Ayo bangun!",
-	":)", ":D", "WOW", "LOL", "?",
+	"Halo",
+	"GG",
+	"Siap!",
+	"Tunggu",
+	"Ayo bangun!",
+	":)",
+	":D",
+	"WOW",
+	"LOL",
+	"?",
 ]
 const PANEL_MIN_WIDTH := 420.0
 const BTN_MIN_HEIGHT := 48.0
@@ -32,7 +40,9 @@ func _ready() -> void:
 func _build_ui() -> void:
 	_panel = PanelContainer.new()
 	add_child(_panel)
-	_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 12)
+	_panel.set_anchors_and_offsets_preset(
+		Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 12
+	)
 
 	var root := VBoxContainer.new()
 	root.custom_minimum_size = Vector2(PANEL_MIN_WIDTH, 0)
@@ -84,6 +94,7 @@ func _build_ui() -> void:
 
 # ----------------------------------------------------------------- API
 
+
 func toggle() -> void:
 	if _panel == null:
 		return
@@ -100,6 +111,7 @@ func open_emotes() -> void:
 
 
 # ------------------------------------------------------------- handlers
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("open_chat"):
@@ -134,6 +146,7 @@ func _on_setting_changed(key: String, _value: Variant) -> void:
 
 
 # ------------------------------------------------------------- internal
+
 
 func _send_text() -> void:
 	var text := _line_edit.text.strip_edges()

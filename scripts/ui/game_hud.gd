@@ -51,9 +51,10 @@ func _ready() -> void:
 
 	GameState.achievement_unlocked.connect(_on_achievement)
 
-
 	# Sembunyikan tombol duplikat bila TouchControls (joystick) aktif
 	_hide_dup_actions.call_deferred()
+
+
 func _exit_tree() -> void:
 	Input.action_release("jump")
 	Input.action_release("action_a")
@@ -79,7 +80,9 @@ func _build_ui() -> void:
 	psb.content_margin_top = 8.0
 	psb.content_margin_bottom = 8.0
 	profile.add_theme_stylebox_override("panel", psb)
-	profile.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT, Control.PRESET_MODE_MINSIZE, int(MARGIN))
+	profile.set_anchors_and_offsets_preset(
+		Control.PRESET_TOP_LEFT, Control.PRESET_MODE_MINSIZE, int(MARGIN)
+	)
 	profile.grow_horizontal = Control.GROW_DIRECTION_END
 	profile.grow_vertical = Control.GROW_DIRECTION_END
 	_root.add_child(profile)
@@ -119,7 +122,9 @@ func _build_ui() -> void:
 	# ---- Kanan-atas: minimap + tombol Pause (48dp) ----
 	var right_col := VBoxContainer.new()
 	right_col.add_theme_constant_override("separation", 8)
-	right_col.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, int(MARGIN))
+	right_col.set_anchors_and_offsets_preset(
+		Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, int(MARGIN)
+	)
 	right_col.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	right_col.grow_vertical = Control.GROW_DIRECTION_END
 	_root.add_child(right_col)
@@ -144,7 +149,9 @@ func _build_ui() -> void:
 	osb.content_margin_top = 6.0
 	osb.content_margin_bottom = 6.0
 	_objective.add_theme_stylebox_override("panel", osb)
-	_objective.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP, Control.PRESET_MODE_MINSIZE, int(MARGIN))
+	_objective.set_anchors_and_offsets_preset(
+		Control.PRESET_CENTER_TOP, Control.PRESET_MODE_MINSIZE, int(MARGIN)
+	)
 	_objective.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_objective.grow_vertical = Control.GROW_DIRECTION_END
 	_objective.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -160,7 +167,9 @@ func _build_ui() -> void:
 	_right_ctl = VBoxContainer.new()
 	var right_ctl: VBoxContainer = _right_ctl
 	right_ctl.add_theme_constant_override("separation", 10)
-	right_ctl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, int(MARGIN))
+	right_ctl.set_anchors_and_offsets_preset(
+		Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, int(MARGIN)
+	)
 	right_ctl.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	right_ctl.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_root.add_child(right_ctl)
@@ -189,7 +198,9 @@ func _build_ui() -> void:
 	# ---- Kiri-bawah: baris tombol kecil DI ATAS area joystick (offset bawah 150px) ----
 	var left_row := HBoxContainer.new()
 	left_row.add_theme_constant_override("separation", 8)
-	left_row.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, int(MARGIN))
+	left_row.set_anchors_and_offsets_preset(
+		Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, int(MARGIN)
+	)
 	left_row.grow_horizontal = Control.GROW_DIRECTION_END
 	left_row.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	left_row.offset_bottom -= JOYSTICK_CLEARANCE
@@ -234,6 +245,7 @@ func _world_settings() -> Dictionary:
 
 # ------------------------------------------------------------- health binding
 
+
 func _try_bind_player() -> void:
 	if _player != null and is_instance_valid(_player):
 		return
@@ -247,9 +259,7 @@ func _try_bind_player() -> void:
 			p.connect("health_changed", _on_health_changed)
 		var hp: Variant = p.get("health")
 		var max_hp: Variant = p.get("max_health")
-		_set_health(
-			float(hp) if hp != null else 100.0,
-			float(max_hp) if max_hp != null else 100.0)
+		_set_health(float(hp) if hp != null else 100.0, float(max_hp) if max_hp != null else 100.0)
 	if p.has_signal("died"):
 		if not p.is_connected("died", _on_player_died):
 			p.connect("died", _on_player_died)
@@ -274,12 +284,16 @@ func _set_health(hp: float, max_hp: float) -> void:
 
 # ------------------------------------------------------------------- actions
 
+
 func _on_pause() -> void:
 	var game := get_tree().get_first_node_in_group("game")
 	if game != null and game.has_method("request_pause"):
 		game.call("request_pause")
 	else:
-		Toast.show(self, _t("hud_pause_unavailable", "Menu jeda belum tersedia", "Pause menu is not available"))
+		Toast.show(
+			self,
+			_t("hud_pause_unavailable", "Menu jeda belum tersedia", "Pause menu is not available")
+		)
 
 
 func _on_sprint_toggled(pressed: bool) -> void:
@@ -302,13 +316,18 @@ func _on_emote() -> void:
 	if chat != null and chat.has_method("open_emotes"):
 		chat.call("open_emotes")
 	else:
-		Toast.show(self, _t("hud_emote_unavailable", "Emote belum tersedia", "Emotes are not available"))
+		Toast.show(
+			self, _t("hud_emote_unavailable", "Emote belum tersedia", "Emotes are not available")
+		)
 
 
 func _on_screenshot() -> void:
 	var path := Screenshot.capture(self)
 	if path == "":
-		Toast.show(self, _t("error_generic", "Terjadi kesalahan. Coba lagi.", "Something went wrong. Try again."))
+		Toast.show(
+			self,
+			_t("error_generic", "Terjadi kesalahan. Coba lagi.", "Something went wrong. Try again.")
+		)
 	else:
 		Toast.show(self, path)
 
@@ -318,13 +337,18 @@ func _on_build() -> void:
 	if game != null and game.has_method("toggle_build_mode"):
 		game.call("toggle_build_mode")
 	else:
-		Toast.show(self, _t("hud_build_unavailable", "Mode bangun belum tersedia", "Build mode is not available"))
+		Toast.show(
+			self,
+			_t("hud_build_unavailable", "Mode bangun belum tersedia", "Build mode is not available")
+		)
 
 
 func _on_weather() -> void:
 	var weather := get_tree().get_first_node_in_group("env_weather")
 	if weather == null:
-		Toast.show(self, _t("hud_weather_unavailable", "Cuaca belum tersedia", "Weather is not available"))
+		Toast.show(
+			self, _t("hud_weather_unavailable", "Cuaca belum tersedia", "Weather is not available")
+		)
 		return
 	if weather.has_method("cycle_weather"):
 		weather.call("cycle_weather")
@@ -388,6 +412,7 @@ func _hide_dup_actions() -> void:
 	var tc := get_tree().get_first_node_in_group("touch_controls")
 	if tc != null:
 		_right_ctl.visible = false
+
 
 func _t(key: String, fb_id: String, fb_en: String) -> String:
 	var s := String(Locale.t(key))

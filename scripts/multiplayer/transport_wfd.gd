@@ -16,6 +16,7 @@ extends Node
 ## Semua method mengikuti interface lan_backend.gd dan aman dipanggil
 ## kapan pun (tanpa efek samping, selalu return ERR_UNAVAILABLE / default).
 
+
 func setup(_facade: Node) -> void:
 	pass
 

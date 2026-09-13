@@ -185,43 +185,67 @@ func _t(key: String, fb_id: String, fb_en: String) -> String:
 
 func _fb_title() -> String:
 	match _index:
-		0: return "Selamat Datang di RBlox"
-		1: return "Bergersi"
-		2: return "Kamera"
-		3: return "Lompat & Lari"
-		4: return "Mode Bangun"
-		5: return "Simpan Dunia"
+		0:
+			return "Selamat Datang di RBlox"
+		1:
+			return "Bergersi"
+		2:
+			return "Kamera"
+		3:
+			return "Lompat & Lari"
+		4:
+			return "Mode Bangun"
+		5:
+			return "Simpan Dunia"
 	return "RBlox"
 
 
 func _fb_title_en() -> String:
 	match _index:
-		0: return "Welcome to RBlox"
-		1: return "Moving Around"
-		2: return "Camera"
-		3: return "Jump & Sprint"
-		4: return "Build Mode"
-		5: return "Save Your World"
+		0:
+			return "Welcome to RBlox"
+		1:
+			return "Moving Around"
+		2:
+			return "Camera"
+		3:
+			return "Jump & Sprint"
+		4:
+			return "Build Mode"
+		5:
+			return "Save Your World"
 	return "RBlox"
 
 
 func _fb_body() -> String:
 	match _index:
-		0: return "Jelajahi dunia, bangun apa saja, lalu bagikan ke temanmu. Ikuti panduan singkat ini."
-		1: return "Gunakan joystick di sisi kiri layar untuk berjalan."
-		2: return "Sentuh dan seret di sisi kanan layar untuk melihat sekeliling."
-		3: return "Tombol besar di kanan bawah: lompat, lari, dan aksi."
-		4: return "Buka mode bangun, pilih blok, lalu tempatkan di dunia."
-		5: return "Simpan duniamu dari menu jeda agar tidak hilang."
+		0:
+			return "Jelajahi dunia, bangun apa saja, lalu bagikan ke temanmu. Ikuti panduan singkat ini."
+		1:
+			return "Gunakan joystick di sisi kiri layar untuk berjalan."
+		2:
+			return "Sentuh dan seret di sisi kanan layar untuk melihat sekeliling."
+		3:
+			return "Tombol besar di kanan bawah: lompat, lari, dan aksi."
+		4:
+			return "Buka mode bangun, pilih blok, lalu tempatkan di dunia."
+		5:
+			return "Simpan duniamu dari menu jeda agar tidak hilang."
 	return ""
 
 
 func _fb_body_en() -> String:
 	match _index:
-		0: return "Explore the world, build anything, then share it with friends. Quick guide ahead."
-		1: return "Use the joystick on the left side of the screen to walk."
-		2: return "Touch and drag on the right side of the screen to look around."
-		3: return "Big buttons at the bottom right: jump, sprint, and action."
-		4: return "Open build mode, pick a block, then place it in the world."
-		5: return "Save your world from the pause menu so it is never lost."
+		0:
+			return "Explore the world, build anything, then share it with friends. Quick guide ahead."
+		1:
+			return "Use the joystick on the left side of the screen to walk."
+		2:
+			return "Touch and drag on the right side of the screen to look around."
+		3:
+			return "Big buttons at the bottom right: jump, sprint, and action."
+		4:
+			return "Open build mode, pick a block, then place it in the world."
+		5:
+			return "Save your world from the pause menu so it is never lost."
 	return ""

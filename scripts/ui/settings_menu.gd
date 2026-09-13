@@ -103,16 +103,21 @@ func _build() -> void:
 	# Audio (EN: Audio)
 	content.add_child(UiKit.make_label(Locale.t("settings_audio"), 24))
 	_add_volume_row(content, Locale.t("settings_master"), "master_volume")  # EN: Master Volume
-	_add_volume_row(content, Locale.t("settings_music"), "music_volume")    # EN: Music Volume
-	_add_volume_row(content, Locale.t("settings_sfx"), "sfx_volume")        # EN: SFX Volume
+	_add_volume_row(content, Locale.t("settings_music"), "music_volume")  # EN: Music Volume
+	_add_volume_row(content, Locale.t("settings_sfx"), "sfx_volume")  # EN: SFX Volume
 
 	# Kualitas Grafis (EN: Graphics Quality)
 	content.add_child(UiKit.make_label(Locale.t("settings_graphics"), 20))
-	var q_ob := UiKit.make_option_button([
-		Locale.t("settings_quality_low"),      # EN: Low
-		Locale.t("settings_quality_medium"),   # EN: Medium
-		Locale.t("settings_quality_high"),     # EN: High
-	])
+	var q_ob := (
+		UiKit
+		. make_option_button(
+			[
+				Locale.t("settings_quality_low"),  # EN: Low
+				Locale.t("settings_quality_medium"),  # EN: Medium
+				Locale.t("settings_quality_high"),  # EN: High
+			]
+		)
+	)
 	var q_idx := QUALITY_CODES.find(String(Settings.get_value("graphics_quality", "medium")))
 	q_ob.select(maxi(q_idx, 0))
 	q_ob.item_selected.connect(_on_quality_selected)
@@ -131,7 +136,9 @@ func _build() -> void:
 	sens_row.add_theme_constant_override("separation", 16)
 	content.add_child(sens_row)
 	sens_row.add_child(UiKit.make_label(Locale.t("settings_sensitivity"), 18))
-	var sens_val := UiKit.make_label("%.2fx" % float(Settings.get_value("camera_sensitivity", 1.0)), 18)
+	var sens_val := UiKit.make_label(
+		"%.2fx" % float(Settings.get_value("camera_sensitivity", 1.0)), 18
+	)
 	sens_val.custom_minimum_size = Vector2(72, 0)
 	sens_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	sens_row.add_child(sens_val)

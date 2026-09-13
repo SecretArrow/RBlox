@@ -10,7 +10,7 @@ const ATTACKER_INTERVAL := 12.0
 const BED_HIT_RANGE := 2.2
 const PLAYER_HIT_RANGE := 1.3
 
-var _beds: Array = []           # [{pos, team, hp, alive}]
+var _beds: Array = []  # [{pos, team, hp, alive}]
 var _attacker: Node = null
 var _spawn_cd := 6.0
 var _over := false
@@ -67,7 +67,10 @@ func tick(delta: float) -> void:
 		_attacker.call("set_waypoints", [bpos])
 		_target_cd = 0.5
 	# Rusak kasur lewat jarak.
-	if Vector2(a3d.global_position.x - bpos.x, a3d.global_position.z - bpos.z).length() < BED_HIT_RANGE:
+	if (
+		Vector2(a3d.global_position.x - bpos.x, a3d.global_position.z - bpos.z).length()
+		< BED_HIT_RANGE
+	):
 		bed["hp"] = float(bed["hp"]) - BED_DPS * delta
 		if float(bed["hp"]) <= 0.0:
 			bed["alive"] = false
@@ -78,18 +81,25 @@ func tick(delta: float) -> void:
 	# Damage kontak ke pemain.
 	if _hit_cd <= 0.0 and player_alive():
 		var ppos := player_pos()
-		if Vector2(a3d.global_position.x - ppos.x, a3d.global_position.z - ppos.z).length() < PLAYER_HIT_RANGE:
+		if (
+			Vector2(a3d.global_position.x - ppos.x, a3d.global_position.z - ppos.z).length()
+			< PLAYER_HIT_RANGE
+		):
 			_hit_cd = 1.0
 			damage_player(6.0)
 
 
 func _spawn_attacker() -> void:
 	# Turun di pulau tengah lalu berjalan ke kasur terdekat.
-	var npc := spawn_npc("attacker", Vector3(0, 0.8, 0), {
-		"speed": 2.2,
-		"name": Locale.t("npc_attacker"),
-		"color": "#ef5350",
-	})
+	var npc := spawn_npc(
+		"attacker",
+		Vector3(0, 0.8, 0),
+		{
+			"speed": 2.2,
+			"name": Locale.t("npc_attacker"),
+			"color": "#ef5350",
+		}
+	)
 	if npc != null:
 		_attacker = npc
 

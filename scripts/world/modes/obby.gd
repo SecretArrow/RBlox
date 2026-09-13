@@ -8,7 +8,7 @@ const FALL_Y := -12.0
 const CP_RANGE := 1.5
 const CP_DAMAGE := 10.0
 
-var _cps: Array = []            # [{pos: Vector3, hit: bool}]
+var _cps: Array = []  # [{pos: Vector3, hit: bool}]
 var _current := 0
 var _respawn := Vector3.ZERO
 var _cd := 0.0
@@ -37,7 +37,10 @@ func tick(delta: float) -> void:
 		if bool(cp["hit"]):
 			continue
 		var cpos: Vector3 = cp["pos"]
-		if Vector2(pos.x - cpos.x, pos.z - cpos.z).length() < CP_RANGE and absf(pos.y - cpos.y) < 2.5:
+		if (
+			Vector2(pos.x - cpos.x, pos.z - cpos.z).length() < CP_RANGE
+			and absf(pos.y - cpos.y) < 2.5
+		):
 			cp["hit"] = true
 			_current += 1
 			_respawn = cpos + Vector3(0, 1.2, 0)

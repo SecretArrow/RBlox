@@ -10,14 +10,49 @@ const CosmeticsDB := preload("res://scripts/avatar/cosmetics_db.gd")
 const SCENE_MENU := "res://scenes/main_menu.tscn"
 const SLOTS := ["hat", "hair", "face", "shirt", "pants", "accessory", "wings", "back", "hand"]
 const PARTS := ["skin", "shirt", "pants", "hair"]
-const PALETTE := ["#f5d3b3", "#e0b088", "#c68642", "#8d5524", "#5c3317", "#ffffff", "#d9d9d9", "#8a8a8a", "#3a3a3a", "#1a1a1a", "#e74c3c", "#c0392b", "#e91e63", "#ff69b4", "#9b59b6", "#6a3fa0", "#4f8cff", "#2f6fed", "#3498db", "#5ad48a", "#2f9e5f", "#27ae60", "#f1c40f", "#f39c12"]
-const SLOT_FB := {"hat": ["slot_hat", "Topi", "Hat"], "hair": ["slot_hair", "Rambut", "Hair"],
-	"face": ["slot_face", "Wajah", "Face"], "shirt": ["slot_shirt", "Baju", "Shirt"],
-	"pants": ["slot_pants", "Celana", "Pants"], "accessory": ["slot_acc", "Aksesori", "Acc"],
-	"wings": ["slot_wings", "Sayap", "Wings"], "back": ["slot_back", "Punggung", "Back"],
-	"hand": ["slot_hand", "Tangan", "Hand"]}
-const PART_FB := {"skin": ["part_skin", "Kulit", "Skin"], "shirt": ["part_shirt", "Baju", "Shirt"],
-	"pants": ["part_pants", "Celana", "Pants"], "hair": ["part_hair", "Rambut", "Hair"]}
+const PALETTE := [
+	"#f5d3b3",
+	"#e0b088",
+	"#c68642",
+	"#8d5524",
+	"#5c3317",
+	"#ffffff",
+	"#d9d9d9",
+	"#8a8a8a",
+	"#3a3a3a",
+	"#1a1a1a",
+	"#e74c3c",
+	"#c0392b",
+	"#e91e63",
+	"#ff69b4",
+	"#9b59b6",
+	"#6a3fa0",
+	"#4f8cff",
+	"#2f6fed",
+	"#3498db",
+	"#5ad48a",
+	"#2f9e5f",
+	"#27ae60",
+	"#f1c40f",
+	"#f39c12"
+]
+const SLOT_FB := {
+	"hat": ["slot_hat", "Topi", "Hat"],
+	"hair": ["slot_hair", "Rambut", "Hair"],
+	"face": ["slot_face", "Wajah", "Face"],
+	"shirt": ["slot_shirt", "Baju", "Shirt"],
+	"pants": ["slot_pants", "Celana", "Pants"],
+	"accessory": ["slot_acc", "Aksesori", "Acc"],
+	"wings": ["slot_wings", "Sayap", "Wings"],
+	"back": ["slot_back", "Punggung", "Back"],
+	"hand": ["slot_hand", "Tangan", "Hand"]
+}
+const PART_FB := {
+	"skin": ["part_skin", "Kulit", "Skin"],
+	"shirt": ["part_shirt", "Baju", "Shirt"],
+	"pants": ["part_pants", "Celana", "Pants"],
+	"hair": ["part_hair", "Rambut", "Hair"]
+}
 
 var _cfg: Dictionary = {}
 var _holder: Node3D = null
@@ -48,7 +83,9 @@ func _process(delta: float) -> void:
 
 # ------------------------------------------------------------------ UI ----
 func _build_ui() -> void:
-	add_child(UiKit.make_background(UiKit.COL_BG_DARK if Settings.is_dark_mode() else UiKit.COL_BG_LIGHT))
+	add_child(
+		UiKit.make_background(UiKit.COL_BG_DARK if Settings.is_dark_mode() else UiKit.COL_BG_LIGHT)
+	)
 	_toast_layer = UiKit.make_toast_layer()
 	add_child(_toast_layer)
 	var root := VBoxContainer.new()
@@ -246,7 +283,9 @@ func _randomize_cfg() -> void:
 	var eq: Dictionary = _cfg.get("equipped", {})
 	for slot in SLOTS:
 		var items := CosmeticsDB.items_for_slot(slot)
-		eq[slot] = "" if items.is_empty() or randf() < 0.2 else str(items.pick_random().get("id", ""))
+		eq[slot] = (
+			"" if items.is_empty() or randf() < 0.2 else str(items.pick_random().get("id", ""))
+		)
 	_cfg["equipped"] = eq
 	_spawn_rig()
 
@@ -257,7 +296,9 @@ func _save() -> void:
 	_saving = true
 	GameState.set_avatar_config(_cfg.duplicate(true))
 	if GameState.unlock_achievement("avatar_customized"):
-		UiKit.show_toast(_toast_layer, _tr("ach_avatar_customized", "Avatar tersimpan!", "Avatar customized!"))
+		UiKit.show_toast(
+			_toast_layer, _tr("ach_avatar_customized", "Avatar tersimpan!", "Avatar customized!")
+		)
 		await get_tree().create_timer(0.9).timeout
 	_goto_menu()
 

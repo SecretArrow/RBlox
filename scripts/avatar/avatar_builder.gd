@@ -6,10 +6,17 @@ extends Node3D
 
 const CosmeticsDB := preload("res://scripts/avatar/cosmetics_db.gd")
 
-const DEF_CFG := {"skin": "#e0b088", "shirt": "#4f8cff", "pants": "#34495e",
-	"hair": "#3b2314", "face": "smile"}
-const PARENT_NODE := {"head": "Head", "torso": "Torso", "arm_l": "ArmL",
-	"arm_r": "ArmR", "leg_l": "LegL", "leg_r": "LegR"}
+const DEF_CFG := {
+	"skin": "#e0b088", "shirt": "#4f8cff", "pants": "#34495e", "hair": "#3b2314", "face": "smile"
+}
+const PARENT_NODE := {
+	"head": "Head",
+	"torso": "Torso",
+	"arm_l": "ArmL",
+	"arm_r": "ArmR",
+	"leg_l": "LegL",
+	"leg_r": "LegR"
+}
 
 static var _mat_cache: Dictionary = {}
 
@@ -35,10 +42,23 @@ static func build(config: Dictionary) -> Node3D:
 	var pants := _cfg_color(config, "pants")
 	_part(rig, "Head", Vector3(0, 1.55, 0), Vector3(0.5, 0.5, 0.5), skin)
 	_part(rig, "Torso", Vector3(0, 1.0, 0), Vector3(0.55, 0.7, 0.3), shirt)
-	_pivot_part(rig, "ArmL", Vector3(-0.385, 1.32, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.325, 0), skin)
-	_pivot_part(rig, "ArmR", Vector3(0.385, 1.32, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.325, 0), skin)
-	_pivot_part(rig, "LegL", Vector3(-0.14, 0.7, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.35, 0), pants)
-	_pivot_part(rig, "LegR", Vector3(0.14, 0.7, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.35, 0), pants)
+	_pivot_part(
+		rig,
+		"ArmL",
+		Vector3(-0.385, 1.32, 0),
+		Vector3(0.22, 0.65, 0.22),
+		Vector3(0, -0.325, 0),
+		skin
+	)
+	_pivot_part(
+		rig, "ArmR", Vector3(0.385, 1.32, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.325, 0), skin
+	)
+	_pivot_part(
+		rig, "LegL", Vector3(-0.14, 0.7, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.35, 0), pants
+	)
+	_pivot_part(
+		rig, "LegR", Vector3(0.14, 0.7, 0), Vector3(0.22, 0.65, 0.22), Vector3(0, -0.35, 0), pants
+	)
 	_face_plane(rig, str(config.get("face", "smile")))
 	var eq: Variant = config.get("equipped", {})
 	if eq is Dictionary:
@@ -61,7 +81,9 @@ static func _part(rig: Node3D, pname: String, pos: Vector3, size: Vector3, color
 	rig.add_child(mi)
 
 
-static func _pivot_part(rig: Node3D, pname: String, pivot_pos: Vector3, size: Vector3, offset: Vector3, color: Color) -> void:
+static func _pivot_part(
+	rig: Node3D, pname: String, pivot_pos: Vector3, size: Vector3, offset: Vector3, color: Color
+) -> void:
 	var pivot := Node3D.new()
 	pivot.name = pname
 	pivot.position = pivot_pos
@@ -265,7 +287,7 @@ static func _face_image(expr: String) -> Image:
 		"sad":
 			_eyes(img, white, dark)
 			for x in range(24, 41):
-				_px(img, x, (44 if absi(x - 32) <= 6 else 45), dark)
+				_px(img, x, 44 if absi(x - 32) <= 6 else 45, dark)
 			_rect(img, 22, 46, 2, 1, dark)
 			_rect(img, 40, 46, 2, 1, dark)
 		"neutral":
@@ -274,7 +296,7 @@ static func _face_image(expr: String) -> Image:
 		_:
 			_eyes(img, white, dark)
 			for x in range(22, 43):
-				_px(img, x, (45 if absi(x - 32) <= 8 else 44), dark)
+				_px(img, x, 45 if absi(x - 32) <= 8 else 44, dark)
 			_px(img, 21, 43, dark)
 			_px(img, 42, 43, dark)
 	return img

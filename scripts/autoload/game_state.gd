@@ -13,7 +13,8 @@ const DEFAULT_AVATAR := {
 	"pants": "#34495e",
 	"hair": "#3b2314",
 	"face": "smile",
-	"equipped": {
+	"equipped":
+	{
 		"hat": "",
 		"hair": "hair_short",
 		"face": "face_smile",
@@ -106,6 +107,7 @@ func goto_scene(path: String) -> void:
 
 # ------------------------------------------------------------------ internal
 
+
 func _load_avatar() -> void:
 	avatar_config = DEFAULT_AVATAR.duplicate(true)
 	if FileAccess.file_exists(AVATAR_PATH):
@@ -135,6 +137,7 @@ func _save_progress() -> void:
 
 
 # ------------------------------------------------------- input map bootstrap
+
 
 func _register_inputs() -> void:
 	_add_key_action("move_left", KEY_A)

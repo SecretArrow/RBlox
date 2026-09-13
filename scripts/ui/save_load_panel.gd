@@ -119,6 +119,7 @@ func close() -> void:
 
 # --------------------------------------------------------------------- aksi
 
+
 func _on_save() -> void:
 	var world_name := _name_edit.text.strip_edges()
 	if world_name == "":
@@ -145,8 +146,13 @@ func _on_load() -> void:
 	# EN: simplest load path — queue world, applied after restart from menu.
 	GameState.pending_action = {"mode": "play", "world_path": path}
 	var lang := Locale.get_language()
-	_toast("Restart from the main menu to load this world." if lang == "en"
-			else "Kembali ke menu utama lalu mainkan untuk memuat dunia ini.")
+	_toast(
+		(
+			"Restart from the main menu to load this world."
+			if lang == "en"
+			else "Kembali ke menu utama lalu mainkan untuk memuat dunia ini."
+		)
+	)
 	load_requested.emit(path)
 	close()
 
@@ -205,6 +211,7 @@ func _refresh() -> void:
 
 
 # ------------------------------------------------------------------ internal
+
 
 func _collect_world_data() -> Dictionary:
 	if get_tree() == null:

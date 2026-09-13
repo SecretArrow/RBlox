@@ -18,7 +18,7 @@ const UIKIT_PATH := "res://scripts/ui/ui_kit.gd"
 const STICK_RADIUS := 62.0
 const DEAD_ZONE := 0.08
 const MOUSE_TOUCH_ID := 100  # Synthetic touch index for desktop mouse testing.
-const LAYER_ORDER := 14      # Above HUD, below pause overlay (20).
+const LAYER_ORDER := 14  # Above HUD, below pause overlay (20).
 
 var _player = null
 var _root: Control = null
@@ -36,7 +36,8 @@ var _btn_action: Button = null
 
 
 # Custom-drawn joystick (base ring + knob), input-transparent.
-class JoystickView extends Control:
+class JoystickView:
+	extends Control
 	var radius := 62.0
 	var knob := Vector2.ZERO
 
@@ -144,6 +145,7 @@ func _release_actions() -> void:
 
 # ------------------------------------------------------------------ input
 
+
 func _input(event: InputEvent) -> void:
 	if not visible or _player == null or not is_instance_valid(_player):
 		return
@@ -236,6 +238,7 @@ func _view_size() -> Vector2:
 
 # ------------------------------------------------------------------ buttons
 
+
 func _on_jump_down() -> void:
 	Input.action_press("jump")
 	jump_pressed.emit()
@@ -258,11 +261,13 @@ func _on_action_pressed() -> void:
 	Input.action_press("action_a")
 	action_a_pressed.emit()
 	if is_inside_tree():
-		get_tree().create_timer(0.12).timeout.connect(func() -> void:
-			Input.action_release("action_a"))
+		get_tree().create_timer(0.12).timeout.connect(
+			func() -> void: Input.action_release("action_a")
+		)
 
 
 # ------------------------------------------------------------------ build
+
 
 func _make_button(text: String, side: float, accent: bool) -> Button:
 	# Prefer UiKit when available (>=48dp targets, consistent styling).

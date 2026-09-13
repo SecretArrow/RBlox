@@ -48,6 +48,7 @@ func _ready() -> void:
 
 # ------------------------------------------------------------------- UI
 
+
 func _build_ui() -> void:
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -99,7 +100,9 @@ func _build_ui() -> void:
 	_toast_label = _mk_label("", 15)
 	_toast_panel.add_child(_toast_label)
 	add_child(_toast_panel)
-	_toast_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP, Control.PRESET_MODE_MINSIZE, 24)
+	_toast_panel.set_anchors_and_offsets_preset(
+		Control.PRESET_CENTER_TOP, Control.PRESET_MODE_MINSIZE, 24
+	)
 
 
 func _build_host_panel() -> VBoxContainer:
@@ -217,6 +220,7 @@ func _hide_toast() -> void:
 
 # ------------------------------------------------------------- handlers
 
+
 func _on_transport_selected(index: int) -> void:
 	if index != TRANSPORT_LAN:
 		_toast(Locale.t("error_not_impl"))
@@ -301,7 +305,9 @@ func _on_scan_pressed() -> void:
 			"max": int(r.get("max", 16)),
 		}
 		_rooms.append(entry)
-		_rooms_list.add_item("%s  |  %s  |  %d/%d" % [entry["name"], entry["ip"], entry["players"], entry["max"]])
+		_rooms_list.add_item(
+			"%s  |  %s  |  %d/%d" % [entry["name"], entry["ip"], entry["players"], entry["max"]]
+		)
 	if _rooms.is_empty():
 		_toast(Locale.t("mp_no_rooms"))
 	elif _rooms.size() == 1:
@@ -344,6 +350,7 @@ func _on_kick_pressed(peer_id: int) -> void:
 
 # ------------------------------------------------------- sinyal dari Net
 
+
 func _on_players_changed(list: Array) -> void:
 	_refresh_players(list)
 
@@ -384,6 +391,7 @@ func _on_connection_lost() -> void:
 
 
 # ------------------------------------------------------------- internal
+
 
 func _update_host_section() -> void:
 	var hosting := Net.is_active() and Net.is_host()
@@ -448,7 +456,9 @@ func _refresh_worlds() -> void:
 					continue
 				var tidx := _world_option.item_count
 				_world_sources.append({"kind": "template", "tid": String(entry.get("id", ""))})
-				_world_option.add_item("%s: %s" % [Locale.t("ws_templates"), String(entry.get("name", "?"))], tidx)
+				_world_option.add_item(
+					"%s: %s" % [Locale.t("ws_templates"), String(entry.get("name", "?"))], tidx
+				)
 
 
 func _empty_world_json() -> Dictionary:
@@ -456,7 +466,8 @@ func _empty_world_json() -> Dictionary:
 		"format": "rblox-world",
 		"version": 1,
 		"meta": {"name": "MP Empty", "is_template": false},
-		"settings": {
+		"settings":
+		{
 			"game_mode": "sandbox",
 			"day_night": true,
 			"cycle_minutes": 10.0,

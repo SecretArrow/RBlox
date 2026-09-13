@@ -25,12 +25,17 @@ func list_worlds() -> Array:
 		if data.is_empty():
 			continue
 		var meta: Dictionary = data.get("meta", {})
-		out.append({
-			"name": String(meta.get("name", String(f).trim_suffix(EXT))),
-			"path": path,
-			"modified": FileAccess.get_modified_time(path),
-			"is_template": bool(meta.get("is_template", false)),
-		})
+		(
+			out
+			. append(
+				{
+					"name": String(meta.get("name", String(f).trim_suffix(EXT))),
+					"path": path,
+					"modified": FileAccess.get_modified_time(path),
+					"is_template": bool(meta.get("is_template", false)),
+				}
+			)
+		)
 	out.sort_custom(func(a, b): return int(a.get("modified", 0)) > int(b.get("modified", 0)))
 	return out
 

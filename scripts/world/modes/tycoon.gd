@@ -10,7 +10,7 @@ const PAD_RANGE := 1.5
 const PAD_SIZE := Vector3(2.2, 0.24, 2.2)
 
 var _cash := 0.0
-var _pads: Array = []           # [{pos, price, owned, marker}]
+var _pads: Array = []  # [{pos, price, owned, marker}]
 var _plot := 0
 
 
@@ -50,9 +50,24 @@ func _spawn_property(base: Vector3) -> void:
 	var a := TAU * float(_plot % 8) / 8.0
 	var drop := base + Vector3(cos(a) * 4.0, 0.0, sin(a) * 4.0)
 	var parts := [
-		{"pos": drop + Vector3(0, 1.0, 0), "size": Vector3(1.0, 1.0, 1.0), "color": "#7e57c2", "mat": "plastic"},
-		{"pos": drop + Vector3(0, 2.0, 0), "size": Vector3(1.2, 0.4, 1.2), "color": "#d1c4e9", "mat": "neon"},
-		{"pos": (drop + base) * 0.5 + Vector3(0, 0.2, 0), "size": Vector3(2.0, 0.3, 2.0), "color": "#4dd0e1", "mat": "metal"},
+		{
+			"pos": drop + Vector3(0, 1.0, 0),
+			"size": Vector3(1.0, 1.0, 1.0),
+			"color": "#7e57c2",
+			"mat": "plastic"
+		},
+		{
+			"pos": drop + Vector3(0, 2.0, 0),
+			"size": Vector3(1.2, 0.4, 1.2),
+			"color": "#d1c4e9",
+			"mat": "neon"
+		},
+		{
+			"pos": (drop + base) * 0.5 + Vector3(0, 0.2, 0),
+			"size": Vector3(2.0, 0.3, 2.0),
+			"color": "#4dd0e1",
+			"mat": "metal"
+		},
 	]
 	var i := 0
 	for part in parts:

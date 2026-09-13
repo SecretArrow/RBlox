@@ -12,11 +12,15 @@ func setup(p_world_json: Dictionary, game_node: Node) -> void:
 		base + Vector3(2, 0.5, -6),
 	]
 	for i in range(spots.size()):
-		spawn_npc("villager", spots[i], {
-			"name": "%s %d" % [Locale.t("npc_villager"), i + 1],
-			"speed": 1.3,
-			"color": "#8bc34a",
-		})
+		spawn_npc(
+			"villager",
+			spots[i],
+			{
+				"name": "%s %d" % [Locale.t("npc_villager"), i + 1],
+				"speed": 1.3,
+				"color": "#8bc34a",
+			}
+		)
 
 
 func get_objective_text() -> String:

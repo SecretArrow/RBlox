@@ -22,7 +22,9 @@ const BTN_MIN_HEIGHT := 56.0
 const TOUCH_MIN := 48.0
 
 
-static func make_button(text: String, min_size: Vector2 = Vector2(160, 56), accent: bool = true) -> Button:
+static func make_button(
+	text: String, min_size: Vector2 = Vector2(160, 56), accent: bool = true
+) -> Button:
 	var b := Button.new()
 	var sz := min_size
 	if sz.y < BTN_MIN_HEIGHT:
@@ -34,7 +36,9 @@ static func make_button(text: String, min_size: Vector2 = Vector2(160, 56), acce
 	b.add_theme_stylebox_override("normal", _flat(base, CORNER, 20.0, 12.0))
 	b.add_theme_stylebox_override("hover", _flat(base.lightened(0.10), CORNER, 20.0, 12.0))
 	b.add_theme_stylebox_override("pressed", _flat(base.darkened(0.18), CORNER, 20.0, 14.0))
-	b.add_theme_stylebox_override("disabled", _flat(Color(0.5, 0.53, 0.6, 0.45), CORNER, 20.0, 12.0))
+	b.add_theme_stylebox_override(
+		"disabled", _flat(Color(0.5, 0.53, 0.6, 0.45), CORNER, 20.0, 12.0)
+	)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.add_theme_color_override("font_color", Color.WHITE)
 	b.add_theme_color_override("font_hover_color", Color.WHITE)
@@ -144,7 +148,9 @@ static func show_toast(layer: Control, text: String, duration: float = 2.6) -> v
 	if stack == null:
 		return
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", _flat(Color(0.07, 0.09, 0.14, 0.94), CORNER, 20.0, 12.0))
+	panel.add_theme_stylebox_override(
+		"panel", _flat(Color(0.07, 0.09, 0.14, 0.94), CORNER, 20.0, 12.0)
+	)
 	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var lbl := Label.new()
@@ -162,7 +168,9 @@ static func show_toast(layer: Control, text: String, duration: float = 2.6) -> v
 	tw.tween_callback(panel.queue_free)
 
 
-static func _flat(bg: Color, radius: int = CORNER, margin_h: float = 0.0, margin_v: float = 0.0) -> StyleBoxFlat:
+static func _flat(
+	bg: Color, radius: int = CORNER, margin_h: float = 0.0, margin_v: float = 0.0
+) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
 	sb.set_corner_radius_all(radius)

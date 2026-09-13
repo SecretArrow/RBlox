@@ -7,7 +7,7 @@ const PICK_RANGE := 2.0
 const GUARD_HIT_RANGE := 1.2
 const GUARD_DAMAGE := 20.0
 
-var _fuses: Array = []          # [{pos: Vector3, hit: bool}]
+var _fuses: Array = []  # [{pos: Vector3, hit: bool}]
 var _exit := Vector3.ZERO
 var _has_exit := false
 var _count := 0
@@ -30,12 +30,16 @@ func setup(p_world_json: Dictionary, game_node: Node) -> void:
 		_has_exit = true
 		prop_marker(_exit, "#66bb6a", Vector3(1.2, 2.6, 0.4), Locale.t("mode_horror_exitname"))
 	# Satu penjaga yang mengejar terus.
-	_guard = spawn_npc("chase", spawn_point(0) + Vector3(0, 0.5, -6), {
-		"speed": 2.8,
-		"always": true,
-		"name": Locale.t("npc_guard"),
-		"color": "#5c6bc0",
-	})
+	_guard = spawn_npc(
+		"chase",
+		spawn_point(0) + Vector3(0, 0.5, -6),
+		{
+			"speed": 2.8,
+			"always": true,
+			"name": Locale.t("npc_guard"),
+			"color": "#5c6bc0",
+		}
+	)
 
 
 func tick(delta: float) -> void:

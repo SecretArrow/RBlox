@@ -100,6 +100,7 @@ func get_anim_state() -> int:
 
 # ------------------------------------------------------------------ health
 
+
 func get_health() -> float:
 	return _hp
 
@@ -159,6 +160,7 @@ func set_gravity(g: float) -> void:
 
 # -------------------------------------------------- TouchControls hooks
 
+
 func set_touch_move(vec: Vector2) -> void:
 	_touch_move = vec.limit_length(1.0)
 
@@ -177,6 +179,7 @@ func set_touch_sprint(on: bool) -> void:
 
 
 # ------------------------------------------------------------------ build
+
 
 func _ensure_built() -> void:
 	if _built or not is_inside_tree():
@@ -252,6 +255,7 @@ func _build_name_label() -> void:
 
 
 # ------------------------------------------------------------------ physics
+
 
 func _physics_process(delta: float) -> void:
 	if is_local:

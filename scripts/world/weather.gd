@@ -26,13 +26,19 @@ func _ready() -> void:
 		150 if low_quality else 400,
 		Vector3(0.0, -30.0, 0.0),
 		Vector2(0.07, 0.6),
-		false, 22.0, 1.3)
+		false,
+		22.0,
+		1.3
+	)
 	_snow = _make_particles(
 		Color(1.0, 1.0, 1.0, 0.9),
 		120 if low_quality else 300,
 		Vector3(0.0, -2.5, 0.0),
 		Vector2(0.18, 0.18),
-		true, 1.5, 7.0)
+		true,
+		1.5,
+		7.0
+	)
 	add_child(_rain)
 	add_child(_snow)
 
@@ -97,8 +103,14 @@ func _exit_tree() -> void:
 
 
 func _make_particles(
-	color: Color, amount: int, gravity: Vector3, quad_size: Vector2,
-	billboard: bool, speed: float, lifetime: float) -> GPUParticles3D:
+	color: Color,
+	amount: int,
+	gravity: Vector3,
+	quad_size: Vector2,
+	billboard: bool,
+	speed: float,
+	lifetime: float
+) -> GPUParticles3D:
 	var p := GPUParticles3D.new()
 	p.amount = amount
 	p.lifetime = lifetime

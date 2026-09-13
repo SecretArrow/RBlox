@@ -71,7 +71,9 @@ static func _style_option_button(t: Theme, field: Color, text: Color) -> void:
 	t.set_stylebox("hover", "OptionButton", _flat(field.lightened(0.08), CORNER, 18.0, 12.0))
 	t.set_stylebox("pressed", "OptionButton", _flat(field.darkened(0.10), CORNER, 18.0, 14.0))
 	t.set_stylebox("focus", "OptionButton", StyleBoxEmpty.new())
-	t.set_stylebox("disabled", "OptionButton", _flat(Color(0.5, 0.53, 0.6, 0.35), CORNER, 18.0, 12.0))
+	t.set_stylebox(
+		"disabled", "OptionButton", _flat(Color(0.5, 0.53, 0.6, 0.35), CORNER, 18.0, 12.0)
+	)
 	t.set_color("font_color", "OptionButton", text)
 	t.set_color("font_hover_color", "OptionButton", text)
 	t.set_color("font_pressed_color", "OptionButton", text)
@@ -89,17 +91,31 @@ static func _style_check_button(t: Theme, field: Color, text: Color, accent: Col
 	t.set_font_size("font_size", "CheckButton", FONT_DEFAULT)
 	t.set_stylebox("focus", "CheckButton", StyleBoxEmpty.new())
 	t.set_icon("checked", "CheckButton", _toggle_icon(true, accent, Color.WHITE))
-	t.set_icon("unchecked", "CheckButton", _toggle_icon(false, field, Color(text.r, text.g, text.b, 0.75)))
-	t.set_icon("checked_disabled", "CheckButton", _toggle_icon(true, Color(0.5, 0.53, 0.6, 0.5), Color(1.0, 1.0, 1.0, 0.6)))
-	t.set_icon("unchecked_disabled", "CheckButton", _toggle_icon(false, Color(0.5, 0.53, 0.6, 0.4), Color(1.0, 1.0, 1.0, 0.5)))
+	t.set_icon(
+		"unchecked", "CheckButton", _toggle_icon(false, field, Color(text.r, text.g, text.b, 0.75))
+	)
+	t.set_icon(
+		"checked_disabled",
+		"CheckButton",
+		_toggle_icon(true, Color(0.5, 0.53, 0.6, 0.5), Color(1.0, 1.0, 1.0, 0.6))
+	)
+	t.set_icon(
+		"unchecked_disabled",
+		"CheckButton",
+		_toggle_icon(false, Color(0.5, 0.53, 0.6, 0.4), Color(1.0, 1.0, 1.0, 0.5))
+	)
 
 
 static func _style_slider(t: Theme, field: Color, fill: Color) -> void:
 	t.set_stylebox("slider", "Slider", _strip(_flat(field, 6, 0.0, 0.0), 6.0))
 	t.set_stylebox("grabber_area", "Slider", _strip(_flat(fill, 6, 0.0, 0.0), 6.0))
-	t.set_stylebox("grabber_area_highlight", "Slider", _strip(_flat(fill.lightened(0.15), 6, 0.0, 0.0), 6.0))
+	t.set_stylebox(
+		"grabber_area_highlight", "Slider", _strip(_flat(fill.lightened(0.15), 6, 0.0, 0.0), 6.0)
+	)
 	t.set_icon("grabber", "Slider", _circle_icon(40, Color.WHITE, Color(0.2, 0.25, 0.35, 0.6)))
-	t.set_icon("grabber_highlight", "Slider", _circle_icon(44, Color.WHITE, Color(0.2, 0.25, 0.35, 0.6)))
+	t.set_icon(
+		"grabber_highlight", "Slider", _circle_icon(44, Color.WHITE, Color(0.2, 0.25, 0.35, 0.6))
+	)
 	t.set_icon("grabber_disabled", "Slider", _circle_icon(40, Color(1.0, 1.0, 1.0, 0.5)))
 	t.set_stylebox("focus", "Slider", StyleBoxEmpty.new())
 
@@ -133,7 +149,9 @@ static func _style_popup_menu(t: Theme, panel: Color, text: Color, accent: Color
 	t.set_color("font_disabled_color", "PopupMenu", Color(text.r, text.g, text.b, 0.4))
 	t.set_color("font_accelerator_color", "PopupMenu", Color(text.r, text.g, text.b, 0.55))
 	t.set_font_size("font_size", "PopupMenu", FONT_DEFAULT)
-	t.set_stylebox("separator", "PopupMenu", _flat(Color(text.r, text.g, text.b, 0.15), 0, 0.0, 1.0))
+	t.set_stylebox(
+		"separator", "PopupMenu", _flat(Color(text.r, text.g, text.b, 0.15), 0, 0.0, 1.0)
+	)
 
 
 static func _style_separator(t: Theme, text: Color) -> void:
@@ -142,7 +160,9 @@ static func _style_separator(t: Theme, text: Color) -> void:
 	t.set_stylebox("separator", "VSeparator", line)
 
 
-static func _flat(bg: Color, radius: int = CORNER, margin_h: float = 0.0, margin_v: float = 0.0) -> StyleBoxFlat:
+static func _flat(
+	bg: Color, radius: int = CORNER, margin_h: float = 0.0, margin_v: float = 0.0
+) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
 	sb.set_corner_radius_all(radius)
@@ -177,7 +197,9 @@ static func _toggle_icon(is_on: bool, track: Color, knob: Color) -> ImageTexture
 	return ImageTexture.create_from_image(img)
 
 
-static func _circle_icon(diameter: int, color: Color, outline: Color = Color(0, 0, 0, 0)) -> ImageTexture:
+static func _circle_icon(
+	diameter: int, color: Color, outline: Color = Color(0, 0, 0, 0)
+) -> ImageTexture:
 	var img := Image.create_empty(diameter, diameter, false, Image.FORMAT_RGBA8)
 	var c := float(diameter) * 0.5
 	var rad := c - 1.0

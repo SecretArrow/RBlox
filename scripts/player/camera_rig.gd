@@ -8,7 +8,7 @@ extends Node3D
 
 const SENS_BASE := 0.004
 const PITCH_MIN := -1.2217  # -70 degrees (looking down)
-const PITCH_MAX := 1.3963   # +80 degrees (looking up)
+const PITCH_MAX := 1.3963  # +80 degrees (looking up)
 const DIST_DEFAULT := 4.5
 const DIST_MIN := 2.0
 const DIST_MAX := 8.0

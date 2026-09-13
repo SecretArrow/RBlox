@@ -154,7 +154,7 @@ func _run_line(line: String, vars: Dictionary) -> String:
 			or rhs.begins_with(">")
 		):
 			return Locale.t("ms_err_assign")
-		var val := _eval(rhs, vars)
+		var val: Variant = _eval(rhs, vars)
 		if val == null:
 			return Locale.t("ms_err_expr") + " " + rhs
 		vars[m.get_string(1)] = val

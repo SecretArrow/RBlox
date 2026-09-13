@@ -73,9 +73,9 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
           echo "ANDROID_DEBUG_KEYSTORE_PATH=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
-          # Isi eksplisit keystore debug ke preset (metode teruji CI Godot)
-          sed -i "s|keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|; s|keystore/debug_user=\"\"|keystore/debug_user=\"androiddebugkey\"|; s|keystore/debug_password=\"\"|keystore/debug_password=\"android\"|" export_presets.cfg
-          grep -n "keystore/" export_presets.cfg
+          # Isi eksplisit keystore debug & release ke preset (export-release pakai keystore/release)
+          sed -i "s|keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|; s|keystore/debug_user=\"\"|keystore/debug_user=\"androiddebugkey\"|; s|keystore/debug_password=\"\"|keystore/debug_password=\"android\"|; s|keystore/release=\"\"|keystore/release=\"$HOME/.android/debug.keystore\"|; s|keystore/release_user=\"\"|keystore/release_user=\"androiddebugkey\"|; s|keystore/release_password=\"\"|keystore/release_password=\"android\"|" export_presets.cfg
+          grep -n "keystore/\|gradle_build_directory" export_presets.cfg
 
       - name: Install Android build template (gradle)
         run: |

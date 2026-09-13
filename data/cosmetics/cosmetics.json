@@ -1,0 +1,159 @@
+[
+  {"id":"hat_cap","slot":"hat","name":{"id":"Topi","en":"Cap"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.29,0],"size":[0.42,0.12,0.42],"color":"#d63031"},
+    {"type":"box","parent":"head","pos":[0,0.25,0.26],"size":[0.32,0.05,0.16],"color":"#b71540"}]},
+  {"id":"hat_top","slot":"hat","name":{"id":"Silinder","en":"Top Hat"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.36,0],"size":[0.34,0.26,0.34],"color":"#1a1a1a"},
+    {"type":"box","parent":"head","pos":[0,0.24,0],"size":[0.5,0.05,0.5],"color":"#1a1a1a"}]},
+  {"id":"hat_beanie","slot":"hat","name":{"id":"Kupluk","en":"Beanie"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.27,0],"size":[0.44,0.18,0.44],"color":"#e67e22"},
+    {"type":"sphere","parent":"head","pos":[0,0.38,0],"size":[0.12,0.12,0.12],"color":"#f5f6fa"}]},
+  {"id":"hat_crown","slot":"hat","name":{"id":"Mahkota","en":"Crown"},"shapes":[
+    {"type":"cylinder","parent":"head","pos":[0,0.33,0],"size":[0.36,0.2,0.36],"color":"#f1c40f"},
+    {"type":"sphere","parent":"head","pos":[0,0.45,0],"size":[0.1,0.1,0.1],"color":"#e74c3c"}]},
+  {"id":"hat_party","slot":"hat","name":{"id":"Topi Pesta","en":"Party Hat"},"shapes":[
+    {"type":"prism","parent":"head","pos":[0,0.38,0],"size":[0.26,0.32,0.26],"color":"#e91e63"},
+    {"type":"sphere","parent":"head","pos":[0,0.56,0],"size":[0.09,0.09,0.09],"color":"#f5f6fa"}]},
+  {"id":"hat_straw","slot":"hat","name":{"id":"Topi Jerami","en":"Straw Hat"},"shapes":[
+    {"type":"cylinder","parent":"head","pos":[0,0.24,0],"size":[0.58,0.05,0.58],"color":"#e6c86e"},
+    {"type":"cylinder","parent":"head","pos":[0,0.29,0],"size":[0.3,0.12,0.3],"color":"#d9b44a"}]},
+  {"id":"hat_helmet","slot":"hat","name":{"id":"Helm","en":"Helmet"},"shapes":[
+    {"type":"sphere","parent":"head","pos":[0,0.12,0],"size":[0.56,0.5,0.56],"color":"#95a5a6"},
+    {"type":"box","parent":"head","pos":[0,0.03,0.23],"size":[0.4,0.07,0.1],"color":"#2c3e50"}]},
+  {"id":"hat_horns","slot":"hat","name":{"id":"Tanduk","en":"Horns"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.28,0],"size":[0.44,0.12,0.44],"color":"#4a235a"},
+    {"type":"prism","parent":"head","pos":[-0.2,0.38,0],"size":[0.1,0.26,0.1],"color":"#f5f6fa"},
+    {"type":"prism","parent":"head","pos":[0.2,0.38,0],"size":[0.1,0.26,0.1],"color":"#f5f6fa"}]},
+  {"id":"hair_short","slot":"hair","name":{"id":"Rambut Pendek","en":"Short Hair"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.17,-0.01],"size":[0.52,0.14,0.52],"color":""},
+    {"type":"box","parent":"head","pos":[0,0.0,-0.24],"size":[0.5,0.4,0.06],"color":""}]},
+  {"id":"hair_long","slot":"hair","name":{"id":"Rambut Panjang","en":"Long Hair"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.17,-0.01],"size":[0.52,0.14,0.52],"color":""},
+    {"type":"box","parent":"head","pos":[0,-0.18,-0.25],"size":[0.5,0.8,0.08],"color":""}]},
+  {"id":"hair_spiky","slot":"hair","name":{"id":"Rambut Jabrik","en":"Spiky Hair"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.22,0],"size":[0.5,0.1,0.5],"color":""},
+    {"type":"prism","parent":"head","pos":[0,0.36,0],"size":[0.16,0.2,0.16],"color":""},
+    {"type":"prism","parent":"head","pos":[-0.16,0.34,0.08],"size":[0.14,0.16,0.14],"color":""},
+    {"type":"prism","parent":"head","pos":[0.16,0.34,-0.08],"size":[0.14,0.16,0.14],"color":""}]},
+  {"id":"hair_bun","slot":"hair","name":{"id":"Cepol","en":"Hair Bun"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.17,0],"size":[0.5,0.14,0.5],"color":""},
+    {"type":"sphere","parent":"head","pos":[0,0.3,-0.12],"size":[0.22,0.22,0.22],"color":""}]},
+  {"id":"hair_mohawk","slot":"hair","name":{"id":"Mohawk","en":"Mohawk"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.18,0],"size":[0.5,0.12,0.5],"color":""},
+    {"type":"box","parent":"head","pos":[0,0.32,0],"size":[0.1,0.28,0.5],"color":""}]},
+  {"id":"hair_curly","slot":"hair","name":{"id":"Rambut Keriting","en":"Curly Hair"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.18,0],"size":[0.5,0.12,0.5],"color":""},
+    {"type":"sphere","parent":"head","pos":[-0.18,0.3,0],"size":[0.2,0.2,0.2],"color":""},
+    {"type":"sphere","parent":"head","pos":[0.18,0.3,0],"size":[0.2,0.2,0.2],"color":""},
+    {"type":"sphere","parent":"head","pos":[0,0.32,-0.14],"size":[0.2,0.2,0.2],"color":""}]},
+  {"id":"face_smile","slot":"face","name":{"id":"Wajah Senyum","en":"Smile Face"},"param":{"expression":"smile"},"shapes":[]},
+  {"id":"face_cool","slot":"face","name":{"id":"Wajah Keren","en":"Cool Face"},"param":{"expression":"cool"},"shapes":[]},
+  {"id":"face_sad","slot":"face","name":{"id":"Wajah Sedih","en":"Sad Face"},"param":{"expression":"sad"},"shapes":[]},
+  {"id":"face_angry","slot":"face","name":{"id":"Wajah Marah","en":"Angry Face"},"param":{"expression":"angry"},"shapes":[]},
+  {"id":"face_neutral","slot":"face","name":{"id":"Wajah Datar","en":"Neutral Face"},"param":{"expression":"neutral"},"shapes":[]},
+  {"id":"shirt_basic","slot":"shirt","name":{"id":"Kaos Dasar","en":"Basic Shirt"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.56,0.72,0.32],"color":""}]},
+  {"id":"shirt_tshirt_red","slot":"shirt","name":{"id":"Kaos Merah","en":"Red Tee"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.56,0.72,0.32],"color":"#e74c3c"}]},
+  {"id":"shirt_hoodie","slot":"shirt","name":{"id":"Jaket Hoodie","en":"Hoodie"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.6,0.72,0.34],"color":"#8e44ad"},
+    {"type":"box","parent":"torso","pos":[0,0.38,-0.18],"size":[0.4,0.16,0.22],"color":"#6c3483"}]},
+  {"id":"shirt_stripe","slot":"shirt","name":{"id":"Kaos Garis","en":"Striped Shirt"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.56,0.72,0.32],"color":"#f5f6fa"},
+    {"type":"box","parent":"torso","pos":[0,0.18,0],"size":[0.57,0.12,0.33],"color":"#2f6fed"},
+    {"type":"box","parent":"torso","pos":[0,-0.18,0],"size":[0.57,0.12,0.33],"color":"#2f6fed"}]},
+  {"id":"shirt_tuxedo","slot":"shirt","name":{"id":"Tuxedo","en":"Tuxedo"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.56,0.72,0.32],"color":"#1a1a1a"},
+    {"type":"box","parent":"torso","pos":[0,0,0.166],"size":[0.3,0.56,0.02],"color":"#f5f6fa"},
+    {"type":"prism","parent":"torso","pos":[0,0.22,0.186],"size":[0.1,0.26,0.02],"color":"#c0392b"}]},
+  {"id":"shirt_sport","slot":"shirt","name":{"id":"Kaos Olahraga","en":"Sport Jersey"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.58,0.7,0.33],"color":"#27ae60"},
+    {"type":"box","parent":"torso","pos":[0,0.08,0.17],"size":[0.22,0.24,0.02],"color":"#f5f6fa"}]},
+  {"id":"shirt_pirate","slot":"shirt","name":{"id":"Bajak Laut","en":"Pirate Shirt"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.56,0.72,0.32],"color":"#f5f6fa"},
+    {"type":"box","parent":"torso","pos":[0,0.05,0],"size":[0.58,0.5,0.335],"color":"#6a3fa0"}]},
+  {"id":"shirt_sweater","slot":"shirt","name":{"id":"Sweater","en":"Sweater"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0,0],"size":[0.6,0.7,0.34],"color":"#f39c12"}]},
+  {"id":"pants_basic","slot":"pants","name":{"id":"Celana Dasar","en":"Basic Pants"},"shapes":[
+    {"type":"box","parent":"leg_l","pos":[0,-0.35,0],"size":[0.24,0.68,0.24],"color":""},
+    {"type":"box","parent":"leg_r","pos":[0,-0.35,0],"size":[0.24,0.68,0.24],"color":""}]},
+  {"id":"pants_jeans","slot":"pants","name":{"id":"Jeans","en":"Jeans"},"shapes":[
+    {"type":"box","parent":"leg_l","pos":[0,-0.35,0],"size":[0.24,0.68,0.24],"color":"#2980b9"},
+    {"type":"box","parent":"leg_r","pos":[0,-0.35,0],"size":[0.24,0.68,0.24],"color":"#2980b9"}]},
+  {"id":"pants_shorts","slot":"pants","name":{"id":"Celana Pendek","en":"Shorts"},"shapes":[
+    {"type":"box","parent":"leg_l","pos":[0,-0.16,0],"size":[0.25,0.38,0.25],"color":"#e67e22"},
+    {"type":"box","parent":"leg_r","pos":[0,-0.16,0],"size":[0.25,0.38,0.25],"color":"#e67e22"}]},
+  {"id":"pants_cargo","slot":"pants","name":{"id":"Celana Kargo","en":"Cargo Pants"},"shapes":[
+    {"type":"box","parent":"leg_l","pos":[0,-0.35,0],"size":[0.25,0.68,0.25],"color":"#6d4c41"},
+    {"type":"box","parent":"leg_r","pos":[0,-0.35,0],"size":[0.25,0.68,0.25],"color":"#6d4c41"},
+    {"type":"box","parent":"leg_l","pos":[0,-0.28,0.14],"size":[0.2,0.14,0.07],"color":"#5d4037"},
+    {"type":"box","parent":"leg_r","pos":[0,-0.28,0.14],"size":[0.2,0.14,0.07],"color":"#5d4037"}]},
+  {"id":"pants_tracks","slot":"pants","name":{"id":"Celana Olahraga","en":"Track Pants"},"shapes":[
+    {"type":"box","parent":"leg_l","pos":[0,-0.35,0],"size":[0.24,0.68,0.24],"color":"#c0392b"},
+    {"type":"box","parent":"leg_r","pos":[0,-0.35,0],"size":[0.24,0.68,0.24],"color":"#c0392b"},
+    {"type":"box","parent":"leg_l","pos":[0,-0.35,0.13],"size":[0.26,0.68,0.03],"color":"#f5f6fa"},
+    {"type":"box","parent":"leg_r","pos":[0,-0.35,0.13],"size":[0.26,0.68,0.03],"color":"#f5f6fa"}]},
+  {"id":"pants_skirt","slot":"pants","name":{"id":"Rok","en":"Skirt"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,-0.45,0],"size":[0.6,0.3,0.36],"color":"#8e44ad"}]},
+  {"id":"acc_glasses","slot":"accessory","name":{"id":"Kacamata","en":"Glasses"},"shapes":[
+    {"type":"box","parent":"head","pos":[-0.12,0.02,0.27],"size":[0.14,0.1,0.02],"color":"#1a1a1a"},
+    {"type":"box","parent":"head","pos":[0.12,0.02,0.27],"size":[0.14,0.1,0.02],"color":"#1a1a1a"},
+    {"type":"box","parent":"head","pos":[0,0.03,0.27],"size":[0.1,0.03,0.02],"color":"#1a1a1a"}]},
+  {"id":"acc_sunglasses","slot":"accessory","name":{"id":"Kacamata Hitam","en":"Sunglasses"},"shapes":[
+    {"type":"box","parent":"head","pos":[0,0.03,0.27],"size":[0.42,0.09,0.03],"color":"#14161f"}]},
+  {"id":"acc_headphones","slot":"accessory","name":{"id":"Headphone","en":"Headphones"},"shapes":[
+    {"type":"sphere","parent":"head","pos":[-0.27,0.02,0],"size":[0.12,0.18,0.16],"color":"#2c3e50"},
+    {"type":"sphere","parent":"head","pos":[0.27,0.02,0],"size":[0.12,0.18,0.16],"color":"#2c3e50"},
+    {"type":"box","parent":"head","pos":[0,0.26,0],"size":[0.5,0.06,0.08],"color":"#2c3e50"}]},
+  {"id":"acc_scarf","slot":"accessory","name":{"id":"Syal","en":"Scarf"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0.42,0],"size":[0.52,0.12,0.37],"color":"#c0392b"},
+    {"type":"box","parent":"torso","pos":[0.12,0.24,0.19],"size":[0.12,0.36,0.05],"color":"#a93226"}]},
+  {"id":"acc_necklace","slot":"accessory","name":{"id":"Kalung","en":"Necklace"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0.32,0.165],"size":[0.3,0.04,0.02],"color":"#f1c40f"}]},
+  {"id":"acc_watch","slot":"accessory","name":{"id":"Jam Tangan","en":"Wristwatch"},"shapes":[
+    {"type":"box","parent":"arm_l","pos":[0,-0.5,0],"size":[0.24,0.08,0.24],"color":"#2c3e50"}]},
+  {"id":"wings_angel","slot":"wings","name":{"id":"Sayap Malaikat","en":"Angel Wings"},"shapes":[
+    {"type":"prism","parent":"torso","pos":[-0.34,0.18,-0.24],"size":[0.52,0.72,0.06],"color":"#f5f6fa"},
+    {"type":"prism","parent":"torso","pos":[0.34,0.18,-0.24],"size":[0.52,0.72,0.06],"color":"#f5f6fa"}]},
+  {"id":"wings_bat","slot":"wings","name":{"id":"Sayap Kelelawar","en":"Bat Wings"},"shapes":[
+    {"type":"prism","parent":"torso","pos":[-0.34,0.18,-0.24],"size":[0.52,0.72,0.06],"color":"#4a235a"},
+    {"type":"prism","parent":"torso","pos":[0.34,0.18,-0.24],"size":[0.52,0.72,0.06],"color":"#4a235a"}]},
+  {"id":"wings_butterfly","slot":"wings","name":{"id":"Sayap Kupu-kupu","en":"Butterfly Wings"},"shapes":[
+    {"type":"sphere","parent":"torso","pos":[-0.3,0.3,-0.24],"size":[0.36,0.4,0.06],"color":"#e91e63"},
+    {"type":"sphere","parent":"torso","pos":[0.3,0.3,-0.24],"size":[0.36,0.4,0.06],"color":"#e91e63"},
+    {"type":"sphere","parent":"torso","pos":[-0.26,-0.05,-0.24],"size":[0.28,0.3,0.06],"color":"#f39c12"},
+    {"type":"sphere","parent":"torso","pos":[0.26,-0.05,-0.24],"size":[0.28,0.3,0.06],"color":"#f39c12"}]},
+  {"id":"back_backpack","slot":"back","name":{"id":"Tas Ransel","en":"Backpack"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,0.05,-0.28],"size":[0.4,0.5,0.18],"color":"#27ae60"},
+    {"type":"box","parent":"torso","pos":[0,-0.14,-0.34],"size":[0.26,0.2,0.08],"color":"#1e8449"}]},
+  {"id":"back_jetpack","slot":"back","name":{"id":"Jetpack","en":"Jetpack"},"shapes":[
+    {"type":"cylinder","parent":"torso","pos":[-0.13,0.05,-0.27],"size":[0.15,0.55,0.15],"color":"#7f8c8d"},
+    {"type":"cylinder","parent":"torso","pos":[0.13,0.05,-0.27],"size":[0.15,0.55,0.15],"color":"#7f8c8d"},
+    {"type":"cylinder","parent":"torso","pos":[-0.13,-0.26,-0.27],"size":[0.09,0.1,0.09],"color":"#e67e22"},
+    {"type":"cylinder","parent":"torso","pos":[0.13,-0.26,-0.27],"size":[0.09,0.1,0.09],"color":"#e67e22"}]},
+  {"id":"back_cape","slot":"back","name":{"id":"Jubah","en":"Cape"},"shapes":[
+    {"type":"box","parent":"torso","pos":[0,-0.08,-0.25],"size":[0.6,0.85,0.04],"color":"#a93226"}]},
+  {"id":"back_quiver","slot":"back","name":{"id":"Penah Panah","en":"Quiver"},"shapes":[
+    {"type":"cylinder","parent":"torso","pos":[0.15,0.05,-0.27],"size":[0.13,0.5,0.13],"color":"#6d4c41"},
+    {"type":"box","parent":"torso","pos":[0.13,0.36,-0.27],"size":[0.03,0.18,0.03],"color":"#f1c40f"},
+    {"type":"box","parent":"torso","pos":[0.17,0.36,-0.27],"size":[0.03,0.18,0.03],"color":"#f1c40f"}]},
+  {"id":"hand_sword","slot":"hand","name":{"id":"Pedang","en":"Sword"},"shapes":[
+    {"type":"box","parent":"arm_r","pos":[0,-0.34,0.13],"size":[0.08,0.62,0.08],"color":"#d5dbdb"},
+    {"type":"box","parent":"arm_r","pos":[0,-0.62,0.13],"size":[0.22,0.05,0.1],"color":"#f1c40f"},
+    {"type":"box","parent":"arm_r","pos":[0,-0.71,0.13],"size":[0.07,0.14,0.07],"color":"#6d4c41"}]},
+  {"id":"hand_pickaxe","slot":"hand","name":{"id":"Beliung","en":"Pickaxe"},"shapes":[
+    {"type":"box","parent":"arm_r","pos":[0,-0.52,0.13],"size":[0.06,0.5,0.06],"color":"#6d4c41"},
+    {"type":"box","parent":"arm_r","pos":[0,-0.3,0.13],"size":[0.38,0.09,0.09],"color":"#95a5a6"}]},
+  {"id":"hand_wand","slot":"hand","name":{"id":"Tongkat Sihir","en":"Magic Wand"},"shapes":[
+    {"type":"box","parent":"arm_r","pos":[0,-0.55,0.13],"size":[0.05,0.42,0.05],"color":"#6d4c41"},
+    {"type":"sphere","parent":"arm_r","pos":[0,-0.32,0.13],"size":[0.12,0.12,0.12],"color":"#f1c40f"}]},
+  {"id":"hand_torch","slot":"hand","name":{"id":"Obor","en":"Torch"},"shapes":[
+    {"type":"box","parent":"arm_r","pos":[0,-0.5,0.13],"size":[0.07,0.45,0.07],"color":"#6d4c41"},
+    {"type":"sphere","parent":"arm_r","pos":[0,-0.24,0.13],"size":[0.15,0.18,0.15],"color":"#e67e22"}]},
+  {"id":"hand_balloon","slot":"hand","name":{"id":"Balon","en":"Balloon"},"shapes":[
+    {"type":"box","parent":"arm_r","pos":[0,-0.78,0.1],"size":[0.02,0.3,0.02],"color":"#f5f6fa"},
+    {"type":"sphere","parent":"arm_r","pos":[0,-1.02,0.1],"size":[0.3,0.36,0.3],"color":"#e74c3c"}]},
+  {"id":"hand_shield","slot":"hand","name":{"id":"Perisai","en":"Shield"},"shapes":[
+    {"type":"box","parent":"arm_l","pos":[0,-0.48,0.17],"size":[0.36,0.52,0.06],"color":"#2980b9"},
+    {"type":"sphere","parent":"arm_l","pos":[0,-0.48,0.21],"size":[0.14,0.14,0.03],"color":"#f1c40f"}]}
+]

@@ -1,0 +1,40 @@
+name: CI Auto-Fix
+
+on:
+  workflow_run:
+    workflows: [ "Build Android APK" ]
+    types: [ completed ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: autofix
+  cancel-in-progress: false
+
+jobs:
+  autofix:
+    name: Auto-fix (format + locale) & issue otomatis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Checkout main (full history)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install gdtoolkit (gdformat)
+        run: pip install "gdtoolkit==4.*"
+
+      - name: Run auto-fix script
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/ci_autofix.py

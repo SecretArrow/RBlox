@@ -1,0 +1,20 @@
+# Godot
+.godot/
+*.translation
+
+# Android build template (di-generate saat CI)
+android/build/
+
+# Hasil build
+build/
+*.apk
+*.aab
+
+# Sistem
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# Impor sementara
+user_imports/

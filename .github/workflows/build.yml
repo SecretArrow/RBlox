@@ -1,0 +1,141 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: "Buat GitHub Release (APK) setelah build sukses"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.4.1"
+
+jobs:
+  build:
+    name: Export Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;34.0.0" "platforms;android-34" "platform-tools" > /dev/null
+
+      - name: Cache Godot editor & templates
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/bin/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-linux-templates
+
+      - name: Install Godot
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          V="${GODOT_VERSION}"
+          curl -L --retry 3 -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_linux.x86_64.zip"
+          curl -L --retry 3 -o /tmp/templates.tpz "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_export_templates.tpz"
+          unzip -o /tmp/godot.zip -d /tmp/godotbin
+          sudo mv /tmp/godotbin/Godot_v${V}-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          mkdir -p ~/.local/share/godot/export_templates/${V}.stable
+          unzip -o /tmp/templates.tpz -d /tmp/tpl
+          mv /tmp/tpl/templates/* ~/.local/share/godot/export_templates/${V}.stable/
+
+      - name: Generate debug keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -genkeypair -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null || true
+
+      - name: Install Android build template (gradle)
+        run: |
+          set -e
+          TPLDIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p android/build
+          unzip -o "$TPLDIR/android_source.zip" -d android/build
+
+      - name: Import project assets
+        run: godot --headless --import --path "$PWD"
+
+      - name: Export Android APK
+        run: |
+          set -e
+          mkdir -p build
+          godot --headless --export-release "Android" build/RBlox.apk --path "$PWD" || {
+            echo "::warning::Export gradle gagal, fallback ke preset prebuilt (Android-Quick)"
+            godot --headless --export-release "Android-Quick" build/RBlox.apk --path "$PWD"
+          }
+          ls -lh build
+
+      - name: Check APK size (max 300MB)
+        run: |
+          SIZE=$(du -m build/RBlox.apk | cut -f1)
+          echo "APK: ${SIZE} MB"
+          if [ "$SIZE" -gt 300 ]; then echo "::error::APK melebihi 300MB"; exit 1; fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RBlox-Android
+          path: build/RBlox.apk
+          retention-days: 14
+          if-no-files-found: error
+
+  dev-release:
+    name: Dev pre-release (continuous)
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: RBlox-Android
+          path: build
+      - name: Upsert pre-release dev-build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete dev-build --yes --cleanup-tag 2>/dev/null || true
+          gh release create dev-build build/RBlox.apk --prerelease --title "RBlox Dev Build" --notes "Build otomatis dari commit $GITHUB_SHA. Install: unduh APK, izinkan install dari sumber tidak dikenal. 100% gratis, tanpa iklan."
+
+  tag-release:
+    name: GitHub Release (tag v*)
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: RBlox-Android
+          path: build
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [ "$TAG" = "main" ] || [ -z "$TAG" ]; then TAG="v$(date +%Y%m%d%H%M)-manual"; fi
+          gh release create "$TAG" build/RBlox.apk --title "RBlox $TAG" --generate-notes --clobber 2>/dev/null || gh release upload "$TAG" build/RBlox.apk --clobber

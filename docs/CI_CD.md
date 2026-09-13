@@ -147,3 +147,24 @@ workflow* → centang **create_release** → APK diunggah ke release
 - **Concurrency `autofix`** dengan `cancel-in-progress: false`: antrikan
   auto-fix agar tidak saling menimpa commit.
 - APK artifact disimpan 14 hari — cukup untuk QA tanpa memenuhi storage.
+
+## Release split per ABI (v0.2.0+)
+
+Setiap build sekarang menghasilkan **4 APK** (artifact `RBlox-Android`,
+pre-release `dev-build`, dan GitHub Release bertag `v*`):
+
+| File | Arsitektur | Untuk |
+|---|---|---|
+| `RBlox-arm64-v8a.apk` | 64-bit ARM | HP modern (disarankan, terkecil & tercepat) |
+| `RBlox-armeabi-v7a.apk` | 32-bit ARM | HP/laptop lama |
+| `RBlox-x86_64.apk` | 64-bit x86 | Emulator, ChromeOS |
+| `RBlox-universal.apk` | semua | Cadangan/kompatibilitas maksimum |
+
+Mekanisme: 3 preset ekspor tambahan (`Android-arm64`, `Android-armv7`,
+`Android-x86_64`) di `export_presets.cfg` — masing-masing hanya mengaktifkan
+satu arsitektur sehingga Gradle menghasilkan APK terpisah per ABI, ditambah
+preset universal. Semua preset memakai `min_sdk=24`, `target_sdk=34`,
+versionCode `2`, dan keystore debug yang diisi otomatis oleh CI via `sed`.
+
+Rilis bertag: buat tag `v0.2.0` (`git tag v0.2.0 && git push origin v0.2.0`)
+→ workflow `tag-release` melampirkan keempat APK ke GitHub Release.

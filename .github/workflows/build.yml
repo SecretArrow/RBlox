@@ -50,6 +50,14 @@ jobs:
             ~/.local/share/godot/export_templates
           key: godot-${{ env.GODOT_VERSION }}-linux-templates
 
+      - name: Cache Gradle (AGP & dependensi)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-godot-${{ env.GODOT_VERSION }}-android34
+
       - name: Install Godot
         if: steps.godot-cache.outputs.cache-hit != 'true'
         run: |
@@ -92,27 +100,52 @@ jobs:
       - name: Import project assets
         run: godot --headless --import --path "$PWD"
 
-      - name: Export Android APK
+      - name: Smoke test headless (cek error skrip)
+        run: |
+          set -o pipefail
+          timeout 120 godot --headless --quit-after 30 --path "$PWD" 2>&1 | tee smoke.log
+          if grep -qE "SCRIPT ERROR|Parse Error" smoke.log; then
+            echo "::error::Error skrip terdeteksi saat smoke test"
+            exit 1
+          fi
+
+      - name: Export APK universal
         run: |
           set -e
           mkdir -p build
-          godot --headless --export-release "Android" build/RBlox.apk --path "$PWD" || {
+          godot --headless --export-release "Android" build/RBlox-universal.apk --path "$PWD" || {
             echo "::warning::Export gradle gagal, fallback ke preset prebuilt (Android-Quick)"
-            godot --headless --export-release "Android-Quick" build/RBlox.apk --path "$PWD"
+            godot --headless --export-release "Android-Quick" build/RBlox-universal.apk --path "$PWD"
           }
           ls -lh build
 
-      - name: Check APK size (max 300MB)
+      - name: Export APK split per ABI
         run: |
-          SIZE=$(du -m build/RBlox.apk | cut -f1)
-          echo "APK: ${SIZE} MB"
-          if [ "$SIZE" -gt 300 ]; then echo "::error::APK melebihi 300MB"; exit 1; fi
+          set -e
+          godot --headless --export-release "Android-arm64"   build/RBlox-arm64-v8a.apk    --path "$PWD"
+          godot --headless --export-release "Android-armv7"   build/RBlox-armeabi-v7a.apk  --path "$PWD"
+          godot --headless --export-release "Android-x86_64"  build/RBlox-x86_64.apk       --path "$PWD"
+          ls -lh build
 
-      - name: Upload APK artifact
+      - name: Check APK sizes (max 300MB each)
+        run: |
+          fail=0
+          for f in build/RBlox-*.apk; do
+            SIZE=$(du -m "$f" | cut -f1)
+            echo "APK: $(basename "$f") = ${SIZE} MB"
+            if [ "$SIZE" -gt 300 ]; then echo "::error::$f melebihi 300MB"; fail=1; fi
+          done
+          exit $fail
+
+      - name: Upload APK artifacts (split per ABI + universal)
         uses: actions/upload-artifact@v4
         with:
           name: RBlox-Android
-          path: build/RBlox.apk
+          path: |
+            build/RBlox-universal.apk
+            build/RBlox-arm64-v8a.apk
+            build/RBlox-armeabi-v7a.apk
+            build/RBlox-x86_64.apk
           retention-days: 14
           if-no-files-found: error
 
@@ -122,18 +155,18 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Download APK
+      - name: Download APKs
         uses: actions/download-artifact@v4
         with:
           name: RBlox-Android
           path: build
-      - name: Upsert pre-release dev-build
+      - name: Upsert pre-release dev-build (split per ABI)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
           gh release delete dev-build --yes --cleanup-tag 2>/dev/null || true
-          gh release create dev-build build/RBlox.apk --prerelease --title "RBlox Dev Build" --notes "Build otomatis dari commit $GITHUB_SHA. Install: unduh APK, izinkan install dari sumber tidak dikenal. 100% gratis, tanpa iklan."
+          gh release create dev-build build/RBlox-*.apk --prerelease --title "RBlox Dev Build" --notes "Build otomatis dari commit $GITHUB_SHA (split per ABI).\n\nPilih sesuai CPU HP:\n- arm64-v8a → HP modern (disarankan)\n- armeabi-v7a → HP lama\n- x86_64 → emulator/ChromeOS\n- universal → semua arsitektur\n\nInstall: unduh APK, izinkan install dari sumber tidak dikenal. 100% gratis, tanpa iklan."
 
   tag-release:
     name: GitHub Release (tag v*)
@@ -141,16 +174,16 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Download APK
+      - name: Download APKs
         uses: actions/download-artifact@v4
         with:
           name: RBlox-Android
           path: build
-      - name: Create release
+      - name: Create release (split per ABI)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
           TAG="${GITHUB_REF_NAME}"
           if [ "$TAG" = "main" ] || [ -z "$TAG" ]; then TAG="v$(date +%Y%m%d%H%M)-manual"; fi
-          gh release create "$TAG" build/RBlox.apk --title "RBlox $TAG" --generate-notes --clobber 2>/dev/null || gh release upload "$TAG" build/RBlox.apk --clobber
+          gh release create "$TAG" build/RBlox-*.apk --title "RBlox $TAG — split per ABI" --generate-notes --clobber 2>/dev/null || gh release upload "$TAG" build/RBlox-*.apk --clobber

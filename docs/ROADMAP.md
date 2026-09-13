@@ -52,3 +52,10 @@ Fondasi lengkap yang bisa dimainkan:
 
 1. **MVP → Alpha**: build CI hijau stabil, APK terinstall & playable di Android 7 (API 24) dan Android 14 (API 34), semua 10 template jalan offline, sesi multiplayer LAN 4 pemain tanpa crash 30 menit.
 2. **Alpha → v1.0**: benchmark 60 FPS rata-rata di perangkat target, crash-free rate > 99% sesi uji, fitur Alpha lengkap, dokumen konten kreator terbit.
+
+## Changelog singkat
+
+- **v0.2.0** — Build & rilis **split per ABI** (arm64-v8a, armeabi-v7a, x86_64,
+  universal), cache Gradle di CI, smoke test headless otomatis per push,
+  versionCode 2. Semua APK dirilis di pre-release `dev-build` dan release
+  bertag `v*`.

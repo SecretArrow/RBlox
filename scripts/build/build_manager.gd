@@ -115,8 +115,9 @@ func _process(_delta: float) -> void:
 	if _ghost != null:
 		_ghost.visible = _has_hit and _tool == "place"
 		if _ghost.visible:
-			_ghost.position = _snap_place(hit["position"], hit["normal"],
-					BlockLibrary.default_size(_shape))
+			_ghost.position = _snap_place(
+				hit["position"], hit["normal"], BlockLibrary.default_size(_shape)
+			)
 
 
 func _apply_tool_at(screen_pos: Vector2) -> void:
@@ -150,10 +151,13 @@ func _do_place(hit: Dictionary) -> void:
 	var center := _snap_place(hit["position"], hit["normal"], size)
 	_id_seq += 1
 	var data := {
-		"id": "b%d" % (_id_base + _id_seq), "shape": _shape,
+		"id": "b%d" % (_id_base + _id_seq),
+		"shape": _shape,
 		"pos": [center.x, center.y, center.z],
 		"size": [size.x, size.y, size.z],
-		"color": _color, "mat": _material, "anchored": true,
+		"color": _color,
+		"mat": _material,
+		"anchored": true,
 	}
 	var node: Node3D = _wm.call("place_block", root, data)
 	if node == null:
@@ -269,8 +273,14 @@ func _push_history(entry: Dictionary) -> void:
 func _snap_place(pos: Vector3, normal: Vector3, size: Vector3) -> Vector3:
 	var half := size * 0.5
 	var raw_min := pos + normal * half - half
-	return Vector3(floor(raw_min.x / GRID) * GRID, floor(raw_min.y / GRID) * GRID,
-			floor(raw_min.z / GRID) * GRID) + half
+	return (
+		Vector3(
+			floor(raw_min.x / GRID) * GRID,
+			floor(raw_min.y / GRID) * GRID,
+			floor(raw_min.z / GRID) * GRID
+		)
+		+ half
+	)
 
 
 ## Ray dari kamera; tanpa argumen memakai pusat layar (mobile-first).

@@ -52,6 +52,7 @@ func setup(data: Dictionary) -> void:
 
 # ------------------------------------------------------------------ ops build
 
+
 func raise(x: float, z: float, r: float = BUILD_RADIUS) -> void:
 	_mod_heights(x, z, r, 1)
 
@@ -62,18 +63,14 @@ func lower(x: float, z: float, r: float = BUILD_RADIUS) -> void:
 
 func flatten(x: float, z: float, r: float = BUILD_RADIUS) -> void:
 	var target := int(get_height_at(x, z))
-	if _for_each_tile(x, z, r, func(idx: int) -> void:
-		heights[idx] = target
-	):
+	if _for_each_tile(x, z, r, func(idx: int) -> void: heights[idx] = target):
 		_dirty = true
 
 
 func paint(x: float, z: float, r: float = BUILD_RADIUS, mat: String = "grass") -> void:
 	if not (mat in PAINTS):
 		return
-	if _for_each_tile(x, z, r, func(idx: int) -> void:
-		paint_data[idx] = mat
-	):
+	if _for_each_tile(x, z, r, func(idx: int) -> void: paint_data[idx] = mat):
 		_dirty = true
 
 
@@ -98,6 +95,7 @@ func serialize() -> Dictionary:
 
 # ------------------------------------------------------------------- internal
 
+
 func _physics_process(_delta: float) -> void:
 	if _dirty:
 		_dirty = false
@@ -121,9 +119,12 @@ func _generate_noise() -> void:
 	heights.resize(need)
 	for z in terrain_size:
 		for x in terrain_size:
-			var h := 2.0 + 2.0 * sin(x * 0.35 + terrain_seed) \
-					+ 2.0 * cos(z * 0.28 + terrain_seed * 1.7) \
-					+ 1.2 * sin((x + z) * 0.15 + terrain_seed * 0.5)
+			var h := (
+				2.0
+				+ 2.0 * sin(x * 0.35 + terrain_seed)
+				+ 2.0 * cos(z * 0.28 + terrain_seed * 1.7)
+				+ 1.2 * sin((x + z) * 0.15 + terrain_seed * 0.5)
+			)
 			heights[z * terrain_size + x] = clampi(int(round(h)), 0, MAX_HEIGHT)
 
 
@@ -166,8 +167,11 @@ func _for_each_tile(x: float, z: float, r: float, fn: Callable) -> bool:
 
 
 func _mod_heights(x: float, z: float, r: float, delta: int) -> void:
-	if _for_each_tile(x, z, r, func(idx: int) -> void:
-		heights[idx] = clampi(int(heights[idx]) + delta, 0, MAX_HEIGHT)
+	if _for_each_tile(
+		x,
+		z,
+		r,
+		func(idx: int) -> void: heights[idx] = clampi(int(heights[idx]) + delta, 0, MAX_HEIGHT)
 	):
 		_dirty = true
 
@@ -196,14 +200,12 @@ func _rebuild() -> void:
 			if x + 1 < terrain_size:
 				hn = float(heights[z * terrain_size + x + 1])
 			if hn < h:
-				_add_quad(st, v10, v11, Vector3(x + 1.0, hn, z + 1.0),
-						Vector3(x + 1.0, hn, z), c)
+				_add_quad(st, v10, v11, Vector3(x + 1.0, hn, z + 1.0), Vector3(x + 1.0, hn, z), c)
 			hn = 0.0
 			if z + 1 < terrain_size:
 				hn = float(heights[(z + 1) * terrain_size + x])
 			if hn < h:
-				_add_quad(st, v01, v11, Vector3(x + 1.0, hn, z + 1.0),
-						Vector3(x, hn, z + 1.0), c)
+				_add_quad(st, v01, v11, Vector3(x + 1.0, hn, z + 1.0), Vector3(x, hn, z + 1.0), c)
 	var mesh := st.commit()
 	if _surface == null:
 		_surface = MeshInstance3D.new()

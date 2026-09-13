@@ -11,12 +11,30 @@ const DEFAULT_SIZE := Vector3(1.0, 1.0, 1.0)
 
 ## Palet 24 warna hex (brick-style: merah..oranye..netral gelap).
 const COLORS: Array[String] = [
-	"#e0453a", "#ff7f27", "#ffb300", "#ffe23d",
-	"#c8e04a", "#4caf50", "#2e9e6b", "#26c6da",
-	"#4fc3f7", "#3b7bff", "#3f51b5", "#7e57c2",
-	"#ab47bc", "#e91e63", "#f48fb1", "#ffcc80",
-	"#d7a86e", "#8d6e63", "#5d4037", "#b0b0b0",
-	"#607d8b", "#37474f", "#1b1b1b", "#f5f5f5",
+	"#e0453a",
+	"#ff7f27",
+	"#ffb300",
+	"#ffe23d",
+	"#c8e04a",
+	"#4caf50",
+	"#2e9e6b",
+	"#26c6da",
+	"#4fc3f7",
+	"#3b7bff",
+	"#3f51b5",
+	"#7e57c2",
+	"#ab47bc",
+	"#e91e63",
+	"#f48fb1",
+	"#ffcc80",
+	"#d7a86e",
+	"#8d6e63",
+	"#5d4037",
+	"#b0b0b0",
+	"#607d8b",
+	"#37474f",
+	"#1b1b1b",
+	"#f5f5f5",
 ]
 
 
@@ -110,11 +128,16 @@ static func make_collision(shape: String, size: Vector3 = Vector3.ZERO) -> Shape
 			var hy := s.y * 0.5
 			var hz := s.z * 0.5
 			var cp := ConvexPolygonShape3D.new()
-			cp.points = PackedVector3Array([
-				Vector3(-hx, -hy, -hz), Vector3(hx, -hy, -hz),
-				Vector3(-hx, -hy, hz), Vector3(hx, -hy, hz),
-				Vector3(0.0, hy, -hz), Vector3(0.0, hy, hz),
-			])
+			cp.points = PackedVector3Array(
+				[
+					Vector3(-hx, -hy, -hz),
+					Vector3(hx, -hy, -hz),
+					Vector3(-hx, -hy, hz),
+					Vector3(hx, -hy, hz),
+					Vector3(0.0, hy, -hz),
+					Vector3(0.0, hy, hz),
+				]
+			)
 			return cp
 		_:
 			var bx := BoxShape3D.new()

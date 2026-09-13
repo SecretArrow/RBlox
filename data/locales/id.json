@@ -240,5 +240,7 @@
   "ws_import_hint": "Pilih file .myworld, atau salin ke folder user://imports.",
   "ws_my_worlds": "Dunia Saya",
   "ws_templates": "Template",
-  "ws_title": "Pilih Dunia"
+  "ws_title": "Pilih Dunia",
+  "menu_continue": "Lanjutkan",
+  "toast_session_saved": "Permainan disimpan"
 }

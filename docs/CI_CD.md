@@ -168,3 +168,16 @@ versionCode `2`, dan keystore debug yang diisi otomatis oleh CI via `sed`.
 
 Rilis bertag: buat tag `v0.2.0` (`git tag v0.2.0 && git push origin v0.2.0`)
 → workflow `tag-release` melampirkan keempat APK ke GitHub Release.
+
+## Pratinjau screenshot tanpa install (mode demo)
+
+Engine dapat dirender tanpa APK untuk dokumentasi/QA:
+
+```bash
+xvfb-run -a -s "-screen 0 1280x720x24" godot --path . \
+  --rendering-method gl_compatibility --rendering-driver opengl3 \
+  --audio-driver Dummy -- --screenshot-demo --shot-dir=/abs/path
+```
+
+Menghasilkan `rblox-menu.png` + `rblox-gameplay.png` (dunia kota) — dipakai
+untuk screenshot README (`docs/screenshots/`).

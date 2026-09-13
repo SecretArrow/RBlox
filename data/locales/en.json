@@ -240,5 +240,7 @@
   "ws_import_hint": "Pick a .myworld file, or copy one into user://imports.",
   "ws_my_worlds": "My Worlds",
   "ws_templates": "Templates",
-  "ws_title": "Select World"
+  "ws_title": "Select World",
+  "menu_continue": "Continue",
+  "toast_session_saved": "Game saved"
 }

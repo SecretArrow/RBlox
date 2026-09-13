@@ -6,6 +6,13 @@
 
 > 100% GRATIS — tanpa iklan, tanpa in-app purchase, tanpa lootbox. Semua item kosmetik terbuka sejak awal. Tidak wajib registrasi; data tersimpan lokal di perangkat.
 
+## Pratinjau
+
+| Menu Utama | Gameplay (Kota) |
+|---|---|
+| ![Menu utama RBlox](docs/screenshots/menu.png) | ![Gameplay RBlox kota](docs/screenshots/gameplay.png) |
+
+
 ## Fitur
 
 | Kategori | Detail |
@@ -15,7 +22,7 @@
 | **Multiplayer Lokal** | Host-client via **LAN/Hotspot** hingga 16 pemain (ENet port 24565) + auto-discovery room (UDP 24566), lobby, chat teks + quick emote, kick (host), reconnect otomatis, sinkronisasi posisi & blok. Bluetooth & WiFi Direct: arsitektur plugin siap (fase Alpha) |
 | **Build Mode** | Tempatkan/hapus/putar blok (box, sphere, cylinder, wedge), 5 material, 24 warna, anchored/dynamic (fisika), undo-redo 50 langkah, terrain editor (naik/turun/rata/cat), maks 4000 blok |
 | **Scripting** | Block coding visual (tap-based, 9 perintah) untuk pemula + mini scripting berbasis Expression untuk pengguna mahir |
-| **Save/Share** | Simpan/muat world lokal, ekspor/impor file `.myworld` (JSON) untuk dibagikan |
+| **Save/Share** | Simpan/muat/lanjutkan (resume state) world lokal, ekspor/impor file `.myworld` (JSON) untuk dibagikan |
 | **UI/UX** | Tombol besar (≥48dp), Bahasa **Indonesia + English**, **Dark & Light mode**, kontrol sentuh (joystick + drag kamera) + gamepad Bluetooth |
 | **Performa** | Renderer mobile Godot, target 60 FPS di RAM 3-4GB, APK < 300MB |
 

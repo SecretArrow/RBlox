@@ -174,10 +174,16 @@ Rilis bertag: buat tag `v0.2.0` (`git tag v0.2.0 && git push origin v0.2.0`)
 Engine dapat dirender tanpa APK untuk dokumentasi/QA:
 
 ```bash
-xvfb-run -a -s "-screen 0 1280x720x24" godot --path . \
+Xvfb :99 -screen 0 1920x1080x24 -nolisten tcp &
+sleep 2
+DISPLAY=:99 godot --path . --resolution 1920x1080 \
   --rendering-method gl_compatibility --rendering-driver opengl3 \
   --audio-driver Dummy -- --screenshot-demo --shot-dir=/abs/path
 ```
 
-Menghasilkan `rblox-menu.png` + `rblox-gameplay.png` (dunia kota) — dipakai
-untuk screenshot README (`docs/screenshots/`).
+Menghasilkan `rblox-menu.png` + `rblox-gameplay.png` 1080p (menu AAA + dunia
+kota ber-pose sinematik: pemain di persimpangan, bayangan dimatikan & chip FPS
+disembunyikan khusus tangkapan agar bebas artefak llvmpipe) — dipakai
+untuk screenshot README (`docs/screenshots/`, rename ke `menu.png` /
+`gameplay.png`). Catatan: `xvfb-run` butuh `xauth` yang mungkin tak tersedia;
+pakai `Xvfb` langsung seperti di atas.

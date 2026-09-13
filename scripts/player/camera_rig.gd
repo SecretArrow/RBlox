@@ -24,68 +24,74 @@ var _camera: Camera3D = null
 
 
 func setup(target: Node3D) -> void:
-	_target = target
-	top_level = true
-	_pitch_node = Node3D.new()
-	_pitch_node.name = "CamPitch"
-	add_child(_pitch_node)
-	_camera = Camera3D.new()
-	_camera.name = "PlayerCamera"
-	_camera.fov = 70.0
-	_camera.position = Vector3(0.0, CAM_LIFT, _distance)
-	_camera.current = true
-	_pitch_node.add_child(_camera)
-	_apply()
+        _target = target
+        top_level = true
+        _pitch_node = Node3D.new()
+        _pitch_node.name = "CamPitch"
+        add_child(_pitch_node)
+        _camera = Camera3D.new()
+        _camera.name = "PlayerCamera"
+        _camera.fov = 70.0
+        _camera.position = Vector3(0.0, CAM_LIFT, _distance)
+        _camera.current = true
+        _pitch_node.add_child(_camera)
+        _apply()
 
 
 ## delta in pixels (x = drag right, y = drag down).
 func add_look(delta: Vector2) -> void:
-	var sens := float(Settings.get_value("camera_sensitivity", 1.0))
-	_yaw = wrapf(_yaw - delta.x * SENS_BASE * sens, -PI, PI)
-	_pitch = clampf(_pitch - delta.y * SENS_BASE * sens, PITCH_MIN, PITCH_MAX)
+        var sens := float(Settings.get_value("camera_sensitivity", 1.0))
+        _yaw = wrapf(_yaw - delta.x * SENS_BASE * sens, -PI, PI)
+        _pitch = clampf(_pitch - delta.y * SENS_BASE * sens, PITCH_MIN, PITCH_MAX)
 
 
 func set_yaw(yaw: float) -> void:
-	_yaw = yaw
+        _yaw = yaw
 
 
 func get_yaw() -> float:
-	return _yaw
+        return _yaw
 
 
 ## Basis to convert input (x = right, y = back) into world direction.
 func get_move_basis() -> Basis:
-	return Basis(Vector3.UP, _yaw)
+        return Basis(Vector3.UP, _yaw)
 
 
 func set_distance(d: float) -> void:
-	_distance = clampf(d, DIST_MIN, DIST_MAX)
-	if _camera != null:
-		_camera.position = Vector3(0.0, CAM_LIFT, _distance)
+        _distance = clampf(d, DIST_MIN, DIST_MAX)
+        if _camera != null:
+                _camera.position = Vector3(0.0, CAM_LIFT, _distance)
+
+
+## Set pitch langsung (radian, negatif = melihat ke bawah). Dipakai demo
+## screenshot & fitur sinematik lain; tetap dalam batas PITCH_MIN..PITCH_MAX.
+func set_pitch(p: float) -> void:
+        _pitch = clampf(p, PITCH_MIN, PITCH_MAX)
 
 
 func get_distance() -> float:
-	return _distance
+        return _distance
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Desktop fallback: captured mouse look + wheel zoom. Touch uses TouchControls.
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		add_look(event.relative)
-	elif event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			set_distance(_distance - 0.5)
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			set_distance(_distance + 0.5)
+        # Desktop fallback: captured mouse look + wheel zoom. Touch uses TouchControls.
+        if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+                add_look(event.relative)
+        elif event is InputEventMouseButton and event.pressed:
+                if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+                        set_distance(_distance - 0.5)
+                elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+                        set_distance(_distance + 0.5)
 
 
 func _process(_delta: float) -> void:
-	_apply()
+        _apply()
 
 
 func _apply() -> void:
-	if _target != null and is_instance_valid(_target):
-		global_position = _target.global_position + Vector3(0.0, HEAD_HEIGHT, 0.0)
-	rotation = Vector3(0.0, _yaw, 0.0)
-	if _pitch_node != null:
-		_pitch_node.rotation.x = _pitch
+        if _target != null and is_instance_valid(_target):
+                global_position = _target.global_position + Vector3(0.0, HEAD_HEIGHT, 0.0)
+        rotation = Vector3(0.0, _yaw, 0.0)
+        if _pitch_node != null:
+                _pitch_node.rotation.x = _pitch

@@ -78,10 +78,47 @@ func _run_demo_shots(dir: String) -> void:
         Settings.set_value("tutorial_done", true)
         pending_action = {"mode": "play", "world_id": "city"}
         goto_scene("res://scenes/game.tscn")
-        await _wait_frames(180)
+        await _wait_frames(45)
+        _stage_gameplay_shot()
+        await _wait_frames(165)
         _capture("%s/rblox-gameplay.png" % dir)
         await _wait_frames(10)
         get_tree().quit()
+
+
+## Atur panggung tangkapan gameplay: pemain dipindah ke persimpangan jalan
+## kota (pemandangan terbuka, lampu jalan di frame), kamera over-the-shoulder
+## mengarah ke pusat kota, jam 09.30 yang terang, dan bayangan matahari dimatikan
+## agar render software (llvmpipe di CI) bebas artefak garis/shadow acne.
+func _stage_gameplay_shot() -> void:
+        var game := get_tree().current_scene
+        if game == null:
+                return
+        var p: Node = game.get("local_player")
+        if p is Node3D:
+                var body := p as Node3D
+                if body.has_method("set_gravity"):
+                        body.call("set_gravity", 0.0)  # beku di panggung, tak jatuh
+                body.rotation = Vector3(0.0, PI * 0.25, 0.0)
+                body.global_position = Vector3(16.0, 0.1, 16.0)  # tengah persimpangan
+                var rig := body.get_node_or_null("CameraRig")
+                if rig != null:
+                        rig.call("set_yaw", PI * 0.25)  # pandang ke pusat kota (0,0)
+                        rig.call("set_pitch", -0.10)
+                        rig.call("set_distance", 4.8)
+        var dn := get_tree().get_first_node_in_group("env_day_night")
+        if dn != null:
+                dn.call("set_time", 9.5)
+                for c in dn.get_children():
+                        if c is DirectionalLight3D:
+                                # Bayangan dimatikan khusus tangkapan CI: rasterizer software
+                                # (llvmpipe) menghasilkan shadow-acak garis pada shadow map.
+                                (c as DirectionalLight3D).shadow_enabled = false
+        # Chip FPS disembunyikan untuk pratinjau (angka FPS llvmpipe tak relevan).
+        for lb in game.find_children("*", "Label", true, false):
+                var l := lb as Label
+                if l != null and l.text.ends_with("FPS") and l.get_parent() is Control:
+                        (l.get_parent() as Control).visible = false
 
 
 func _wait_frames(n: int) -> void:

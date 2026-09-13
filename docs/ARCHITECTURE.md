@@ -8,6 +8,7 @@ RBlox adalah game sandbox 3D (Godot 4.4 / GDScript) dengan pola **orchestrator +
 main_menu ──▶ world_select ──▶ game.tscn (Orchestrator)
    │              │                 │
    │              │                 ├── WorldManager.build_world(json)  → WorldRoot/Blocks/Props/Terrain
+   │              │                 │     └── Blocks/MMChunks (MultiMesh per chunk 16u + LOD jarak)
    │              │                 ├── player.tscn (local + remote)
    │              │                 ├── mode controller (10 game mode)
    │              │                 ├── day_night + weather + game_hud (+ minimap)
@@ -72,6 +73,25 @@ main_menu ──▶ world_select ──▶ game.tscn (Orchestrator)
 1. Resolve world: `Net.current_world()` → `GameState.pending_action` (world_id template / world_path file) → fallback "empty".
 2. Build dunia → spawn player lokal + remote (authority per peer) → touch controls → mode controller → env (day/night, weather) → HUD → build mode (bila `build_allowed` & host/SP) → chat (MP) → tutorial (first run).
 3. Sinyal bersih: mode/HUD membaca via **group** (`local_player`, `remote_players`, `npcs`, `game`, `mode_controller`, `env_day_night`, `touch_controls`) — bukan referensi keras.
+
+## Performa Rendering Blok (v0.2)
+
+Modul `scripts/world/mm_chunks.gd` (MMChunks, anak dari `Blocks/`):
+
+- **Chunked MultiMesh**: dunia dibagi chunk kubus 16 unit; tiap chunk
+  mengelompokkan blok statis per bucket `shape|material` menjadi satu
+  `MultiMeshInstance3D` (1 draw call per bucket, bukan 1 per blok).
+  Warna per blok lewat instance color (material `vertex_color_use_as_albedo`).
+- **Fisika tak berubah**: `StaticBody3D` + `CollisionShape3D` tetap dibuat
+  per blok sehingga raycast build tool & collision pemain identik. Blok
+  rigid (non-anchored) tetap memakai `MeshInstance3D` (jalur legacy).
+- **LOD jarak** per kualitas grafis (`graphics_quality`): low 40/72,
+  medium 72/112, high 104/160 — chunk jauh disembunyikan, chunk menengah
+  tanpa bayangan; diperbarui tiap 0.25s.
+- **Cache statis**: 5 mesh unit + 5 material dibagi seluruh dunia (hemat RAM
+  untuk perangkat 3-4GB). Limit build naik 4000 → 12000 blok.
+- **Uji headless**: `tools/test_mm.tscn` (fungsional, dijalankan CI) dan
+  `tools/test_mm_scale.gd` (12.000 blok → ~120 draw call, build 0.4s).
 
 ## Standar Kode
 

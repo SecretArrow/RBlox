@@ -109,6 +109,12 @@ jobs:
             echo "::error::Error skrip terdeteksi saat smoke test"
             exit 1
           fi
+          # EN: functional test of MultiMesh chunk renderer (v0.2)
+          timeout 120 godot --headless res://tools/test_mm.tscn 2>&1 | tee mm.log
+          if ! grep -q "MM_TEST_PASS" mm.log; then
+            echo "::error::MMChunks functional test gagal"
+            exit 1
+          fi
 
       - name: Export APK universal
         run: |

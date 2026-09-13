@@ -242,5 +242,6 @@
   "ws_templates": "Templates",
   "ws_title": "Select World",
   "menu_continue": "Continue",
-  "toast_session_saved": "Game saved"
+  "toast_session_saved": "Game saved",
+  "build_limit": "Block limit reached"
 }

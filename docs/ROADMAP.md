@@ -59,3 +59,11 @@ Fondasi lengkap yang bisa dimainkan:
   universal), cache Gradle di CI, smoke test headless otomatis per push,
   versionCode 2. Semua APK dirilis di pre-release `dev-build` dan release
   bertag `v*`.
+- **v0.2 MultiMesh & LOD** — renderer blok chunked `MMChunks` (target roadmap
+  10.000+ blok tercapai: uji 12.000 blok → ~120 draw call), LOD jarak per
+  kualitas grafis, cache mesh/material bersama (hemat RAM 3-4GB), limit blok
+  4000 → 12000, smoke test CI menjalankan uji fungsional MultiMesh.
+- **UI kelas produksi (AAA pass)** — tema baru: tombol chunky 3D (border bawah
+  + bayangan + animasi tekan), panel kaca membulat, menu hero gradien dengan
+  blok dekoratif melayang, HUD kaca (health bar dinamis hijau→merah, chip FPS,
+  tombol pill), toolbar build dengan swatch ring seleksi, font tebal kontrol.

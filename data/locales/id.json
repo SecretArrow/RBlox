@@ -242,5 +242,6 @@
   "ws_templates": "Template",
   "ws_title": "Pilih Dunia",
   "menu_continue": "Lanjutkan",
-  "toast_session_saved": "Permainan disimpan"
+  "toast_session_saved": "Permainan disimpan",
+  "build_limit": "Batas blok tercapai"
 }

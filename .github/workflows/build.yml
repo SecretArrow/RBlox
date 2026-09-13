@@ -67,7 +67,15 @@ jobs:
       - name: Generate debug keystore
         run: |
           mkdir -p ~/.android
-          keytool -genkeypair -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null || true
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          ls -l "$HOME/.android/debug.keystore"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+          echo "ANDROID_DEBUG_KEYSTORE_PATH=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+          # Isi eksplisit keystore debug ke preset (metode teruji CI Godot)
+          sed -i "s|keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|; s|keystore/debug_user=\"\"|keystore/debug_user=\"androiddebugkey\"|; s|keystore/debug_password=\"\"|keystore/debug_password=\"android\"|" export_presets.cfg
+          grep -n "keystore/" export_presets.cfg
 
       - name: Install Android build template (gradle)
         run: |
@@ -75,6 +83,9 @@ jobs:
           TPLDIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           mkdir -p android/build
           unzip -o "$TPLDIR/android_source.zip" -d android/build
+          # Godot menganggap template ter-install hanya bila penanda ini ada
+          echo "${GODOT_VERSION}.stable" > android/build/.build_version
+          ls android/build | head -8
 
       - name: Import project assets
         run: godot --headless --import --path "$PWD"

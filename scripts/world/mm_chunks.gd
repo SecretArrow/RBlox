@@ -273,7 +273,7 @@ static func _material(mat: String) -> StandardMaterial3D:
 		return _materials[mat]
 	var m := StandardMaterial3D.new()
 	m.vertex_color_use_as_albedo = true
-	m.roughness = 0.8
+	m.roughness = 1.0
 	match mat:
 		"metal":
 			m.metallic = 0.9
@@ -291,6 +291,6 @@ static func _material(mat: String) -> StandardMaterial3D:
 			m.emission_energy_multiplier = 0.9
 			m.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY
 		_:
-			m.roughness = 0.8
+			m.roughness = 1.0
 	_materials[mat] = m
 	return m

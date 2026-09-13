@@ -156,6 +156,49 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  screenshots:
+    name: Pratinjau screenshot (render tanpa install)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Pasang Xvfb + Mesa (render software)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb libgl1 libglx-mesa0 libgl1-mesa-dri
+      - name: Pulihkan cache Godot 4.4.1
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: /opt/godot
+          key: godot-4.4.1-stable-linux
+      - name: Unduh Godot 4.4.1
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /opt/godot
+          curl -fsSL -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -o /tmp/godot.zip -d /opt/godot
+          chmod +x /opt/godot/Godot_v4.4.1-stable_linux.x86_64
+      - name: Render 5 pratinjau 1080p (menu, kota, build, obby, avatar)
+        run: |
+          mkdir -p shots
+          Xvfb :99 -screen 0 1920x1080x24 -nolisten tcp &
+          sleep 2
+          DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1 timeout 900 \
+            /opt/godot/Godot_v4.4.1-stable_linux.x86_64 \
+            --path . --resolution 1920x1080 \
+            --rendering-method gl_compatibility --rendering-driver opengl3 \
+            --audio-driver Dummy -- --screenshot-demo --shot-dir="$PWD/shots"
+          test "$(ls shots/*.png 2>/dev/null | wc -l)" -ge 5
+      - name: Unggah artifact pratinjau
+        uses: actions/upload-artifact@v4
+        with:
+          name: RBlox-Screenshots
+          path: shots/*.png
+          retention-days: 30
+          if-no-files-found: error
+
   dev-release:
     name: Dev pre-release (continuous)
     needs: build

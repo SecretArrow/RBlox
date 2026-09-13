@@ -187,24 +187,15 @@ static func _build_city(w: Dictionary) -> void:
         var blocks: Array = w["blocks"]
         var props: Array = w["props"]
         var rng := _rng_for("city")
-        # Tanah: tile 12.5 unit (bukan satu box 100 unit) — segitiga kecil bebas
-        # artefak interpolasi/moiré pada rasterizer software & z-order lebih rapi.
-        for ix in range(8):
-                for iz in range(8):
-                        _box(
-                                blocks,
-                                Vector3(-43.75 + 12.5 * ix, -0.5, -43.75 + 12.5 * iz),
-                                Vector3(12.5, 1, 12.5),
-                                "#9e9e9e",
-                                "plastic"
-                        )
-        # Jalan grid (2 sejajar X + 2 sejajar Z), disegmentasi 12.5 unit
-        for i in range(8):
-                var c := -43.75 + 12.5 * i
-                _box(blocks, Vector3(c, 0.05, -16), Vector3(12.5, 0.1, 6), "#4a4f54", "plastic")
-                _box(blocks, Vector3(c, 0.05, 16), Vector3(12.5, 0.1, 6), "#4a4f54", "plastic")
-                _box(blocks, Vector3(-16, 0.05, c), Vector3(6, 0.1, 12.5), "#4a4f54", "plastic")
-                _box(blocks, Vector3(16, 0.05, c), Vector3(6, 0.1, 12.5), "#4a4f54", "plastic")
+        # Tanah: SATU box 100x100 (dua segitiga, tanpa sambungan antar tile).
+        _box(blocks, Vector3(0, -0.5, 0), Vector3(100, 1, 100), "#9e9e9e", "plastic")
+        # Jalan grid (2 sejajar X + 2 sejajar Z) — box panjang per garis,
+        # muka atas 0.1 di atas tanah; tinggi cukup agar bebas artefak
+        # kedalaman pada sudut pandang curam.
+        _box(blocks, Vector3(0, -0.4, -16), Vector3(100, 1, 6), "#606468", "plastic")
+        _box(blocks, Vector3(0, -0.4, 16), Vector3(100, 1, 6), "#606468", "plastic")
+        _box(blocks, Vector3(-16, -0.4, 0), Vector3(6, 1, 100), "#606468", "plastic")
+        _box(blocks, Vector3(16, -0.4, 0), Vector3(6, 1, 100), "#606468", "plastic")
         # 20 bangunan box tinggi warna acak pada grid 5x5
         var slots: Array = []
         for gx in range(5):

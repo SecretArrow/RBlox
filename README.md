@@ -10,7 +10,15 @@
 
 | Menu Utama | Gameplay (Kota) |
 |---|---|
-| ![Menu utama RBlox](docs/screenshots/menu.png) | ![Gameplay RBlox kota](docs/screenshots/gameplay.png) |
+| ![Menu utama RBlox](docs/screenshots/rblox-menu.png) | ![Gameplay RBlox kota](docs/screenshots/rblox-gameplay.png) |
+| **Mode Build** (lengkung pelangi + HUD block coding) | **Obby** (spiral platform saat senja) |
+| ![Mode build RBlox](docs/screenshots/rblox-build.png) | ![Obby RBlox senja](docs/screenshots/rblox-obby.png) |
+| **Editor Avatar** (52 kosmetik + preset) | |
+| ![Editor avatar RBlox](docs/screenshots/rblox-avatar.png) | |
+
+> Semua gambar dirender langsung dari engine 1080p (mode `--screenshot-demo`
+> via Xvfb + Mesa software GL) — bukan mockup; lihat
+> [docs/CI_CD.md](docs/CI_CD.md) untuk cara mereproduksi.
 
 
 ## Fitur

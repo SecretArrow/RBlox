@@ -181,9 +181,18 @@ DISPLAY=:99 godot --path . --resolution 1920x1080 \
   --audio-driver Dummy -- --screenshot-demo --shot-dir=/abs/path
 ```
 
-Menghasilkan `rblox-menu.png` + `rblox-gameplay.png` 1080p (menu AAA + dunia
-kota ber-pose sinematik: pemain di persimpangan, bayangan dimatikan & chip FPS
-disembunyikan khusus tangkapan agar bebas artefak llvmpipe) — dipakai
-untuk screenshot README (`docs/screenshots/`, rename ke `menu.png` /
-`gameplay.png`). Catatan: `xvfb-run` butuh `xauth` yang mungkin tak tersedia;
-pakai `Xvfb` langsung seperti di atas.
+Menghasilkan 5 tangkapan 1080p: `rblox-menu.png` (menu utama),
+`rblox-gameplay.png` (kota aerial sinematik), `rblox-build.png` (mode build
+dengan lengkung pelangi + HUD), `rblox-obby.png` (spiral platform senja),
+dan `rblox-avatar.png` (editor avatar). Kualitas tangkapan dijaga khusus
+untuk rasterizer software (llvmpipe): bayangan dimatikan (bebas shadow
+acne), gedung kaca dibuat solid (alpha blend pada wajah miring menghasilkan
+arsir dither), air hanya muncul pada terrain yang di-sculpt (plane air y=1
+dulu "membanjiri" dunia flat), tanah kota satu box tanpa sambungan antar
+tile, dan jalan berupa box tebal ber-atap 0.1u (curb yang bisa dilangkahi).
+
+Hasil render dipakai untuk galeri README (`docs/screenshots/`, nama file
+dipertahankan apa adanya). Workflow CI juga menjalankan job `screenshots`
+paralel yang mengunggah kelima PNG sebagai artifact `RBlox-Screenshots`
+pada setiap push main. Catatan: `xvfb-run` butuh `xauth` yang mungkin tak
+tersedia; pakai `Xvfb` langsung seperti di atas.

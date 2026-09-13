@@ -83,9 +83,11 @@ jobs:
           TPLDIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           mkdir -p android/build
           unzip -o "$TPLDIR/android_source.zip" -d android/build
-          # Godot menganggap template ter-install hanya bila penanda ini ada
-          echo "${GODOT_VERSION}.stable" > android/build/.build_version
-          ls android/build | head -8
+          # Penanda versi template di PARENT build dir (persis perilaku editor Godot)
+          echo "${GODOT_VERSION}.stable" > android/.build_version
+          # Hindari Godot mem-scan pohon gradle sebagai resource
+          touch android/build/.gdignore
+          ls android/build | head -6
 
       - name: Import project assets
         run: godot --headless --import --path "$PWD"
@@ -128,6 +130,7 @@ jobs:
       - name: Upsert pre-release dev-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           gh release delete dev-build --yes --cleanup-tag 2>/dev/null || true
           gh release create dev-build build/RBlox.apk --prerelease --title "RBlox Dev Build" --notes "Build otomatis dari commit $GITHUB_SHA. Install: unduh APK, izinkan install dari sumber tidak dikenal. 100% gratis, tanpa iklan."
@@ -146,6 +149,7 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           TAG="${GITHUB_REF_NAME}"
           if [ "$TAG" = "main" ] || [ -z "$TAG" ]; then TAG="v$(date +%Y%m%d%H%M)-manual"; fi

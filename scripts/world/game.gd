@@ -330,7 +330,7 @@ func toggle_build_mode() -> void:
 	if build_manager == null:
 		return
 	if build_hud != null and build_hud.has_method("open"):
-		var show := not build_hud.visible
+		var show: bool = not (build_hud as CanvasLayer).visible
 		_call_if(build_hud, "open" if show else "close")
 		_build_active = show
 	else:

@@ -5,8 +5,8 @@
 # Android build template (di-generate saat CI)
 android/build/
 
-# Hasil build
-build/
+# Hasil build (hanya di root — JANGAN ignore scripts/build/)
+/build/
 *.apk
 *.aab
 

@@ -82,6 +82,7 @@ class Runner:
             print("FATAL: APK not found: %s" % apk)
             return 2
         adb = Adb(self.args.serial)
+        adb.ensure_online(attempts=3, wait=20)
         print("[apktester] device: %s" % json.dumps(adb.info()))
         results = self._test_once(apk, adb)
         ok = all(r["status"] != "failed" for r in results)

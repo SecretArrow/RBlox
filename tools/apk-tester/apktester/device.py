@@ -19,19 +19,53 @@ class Adb:
             raise DeviceError("no Android device/emulator attached (adb devices empty)")
 
     # -- low level -------------------------------------------------------
+    TRANSIENT_RE = ("offline", "device not found", "device still connecting",
+                    "closed", "connection reset")
+
     def _cmd(self, args, timeout=30, binary=False, check=True):
         cmd = ["adb"]
         if self.serial:
             cmd += ["-s", self.serial]
         cmd += args
-        try:
-            r = subprocess.run(cmd, capture_output=True, timeout=timeout)
-        except subprocess.TimeoutExpired:
-            raise DeviceError("adb timeout: %s" % " ".join(args))
-        if check and r.returncode != 0:
+        for attempt in (1, 2):
+            try:
+                r = subprocess.run(cmd, capture_output=True, timeout=timeout)
+            except subprocess.TimeoutExpired:
+                raise DeviceError("adb timeout: %s" % " ".join(args))
+            if r.returncode == 0:
+                return r.stdout if binary else r.stdout.decode("utf-8", "replace")
+            err = r.stderr.decode("utf-8", "replace").lower()
+            if attempt == 1 and any(t in err for t in self.TRANSIENT_RE):
+                # transient adbd hiccup (device offline) — bounded single retry
+                time.sleep(5)
+                try:
+                    subprocess.run(["adb", "wait-for-device"], timeout=60,
+                                   capture_output=True)
+                except subprocess.TimeoutExpired:
+                    pass
+                continue
             raise DeviceError("adb failed (%s): %s" % (
                 " ".join(args), r.stderr.decode("utf-8", "replace").strip()[:200]))
-        return r.stdout if binary else r.stdout.decode("utf-8", "replace")
+        raise DeviceError("adb failed after retry: %s" % " ".join(args))
+
+    def ensure_online(self, attempts=3, wait=20):
+        """Bounded recovery loop for a sick adbd/emulator after boot."""
+        for i in range(attempts):
+            try:
+                state = self._cmd(["get-state"], timeout=20, check=False)
+                if "device" in state:
+                    return True
+            except DeviceError:
+                pass
+            try:
+                self._cmd(["wait-for-device"], timeout=120, check=False)
+                self.prop("sys.boot_completed", timeout=20)
+                if self.prop("sys.boot_completed") == "1":
+                    return True
+            except DeviceError:
+                pass
+            time.sleep(wait)
+        raise DeviceError("device never became responsive (%d attempts)" % attempts)
 
     def shell(self, cmd, timeout=30):
         return self._cmd(["shell", cmd], timeout=timeout)

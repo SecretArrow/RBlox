@@ -161,6 +161,7 @@ class Runner:
         self.monitor = monitor
         ctx = discovery.DiscoveryContext(adb, apkinfo.package, apkinfo, cfg,
                                          self.args.out)
+        ctx.monitor = monitor          # flows consult live crash state
         self.ctx = ctx
         trace = Trace(self.args.out)
         ctx.recorder = trace

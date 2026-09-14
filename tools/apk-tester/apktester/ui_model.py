@@ -139,7 +139,7 @@ def parse(xml_text):
         elements.append(Element(attrs, b))
         metas.append(attrs)
     meta = {"available": True, "count": len(elements),
-            "packages": sorted({a.get("package", "") for a in metas}) - {""}}
+            "packages": sorted({a.get("package", "") for a in metas} - {""})}
     return elements, meta
 
 

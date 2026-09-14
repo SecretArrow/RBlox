@@ -23,9 +23,26 @@ def flow_lifecycle_core(ctx):
     info = ctx.adb.launch(ctx.package, wait_timeout=90)
     time.sleep(3)
     if not info["resumed"]:
+        pid_now = ctx.adb.pidof(ctx.package)
+        if not pid_now:
+            # Background process was reclaimed by the OS (normal on low-RAM
+            # devices). The app-level contract is that cold relaunch works.
+            res.notes.append("background process reclaimed by system (normal "
+                             "on low-RAM devices)")
+            info = ctx.adb.launch(ctx.package, wait_timeout=120)
+            time.sleep(5)
+            if info["resumed"] and ctx.adb.pidof(ctx.package):
+                res.notes.append("cold restart after reclaim OK — graceful")
+                ctx.finding("minor", "background-reclaim",
+                            "system reclaimed background process; cold "
+                            "restart succeeded", res.name)
+                _check_alive(ctx, res, "reclaim-restart")
+                return res
         res.status = "failed"
         res.failed_action = "foreground-return"
-        ctx.finding("critical", "lifecycle", "app did not return to foreground", res.name)
+        ctx.finding("critical", "lifecycle",
+                    "app did not return to foreground after background "
+                    "(pid alive=%s)" % bool(pid_now), res.name)
         return res
     if not _check_alive(ctx, res, "background/foreground"):
         return res

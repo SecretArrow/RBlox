@@ -173,7 +173,7 @@ def _settle(ctx, seconds=2.0):
     time.sleep(seconds)
 
 
-def screen_snapshot(ctx, name):
+def screen_snapshot(ctx, name=None):
     scr = ctx.screen(name=name)
     if scr.meta.get("available"):
         ctx.model.screens.setdefault(scr.fingerprint, scr)

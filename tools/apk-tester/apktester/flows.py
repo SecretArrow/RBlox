@@ -16,6 +16,7 @@ class FlowResult:
         self.status = status          # passed / failed / warned / skipped
         self.notes = notes or []
         self.failed_action = None
+        self.ts_start = time.time()
 
     def to_dict(self):
         return {"flow": self.name, "status": self.status, "notes": self.notes,
@@ -30,7 +31,7 @@ def _check_alive(ctx, res, where):
         ctx.finding("critical", "process-death", "app process died during %s" % where,
                     res.name)
         return False
-    crash = ctx.monitor.has_critical()
+    crash = ctx.monitor.has_critical(since=res.ts_start)
     if crash is not None:
         res.status = "failed"
         res.failed_action = where

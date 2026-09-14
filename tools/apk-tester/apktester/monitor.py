@@ -117,11 +117,11 @@ class CrashMonitor:
             return [e for e in self.events
                     if severity is None or e.severity == severity]
 
-    def has_critical(self, package_scoped=True):
+    def has_critical(self, package_scoped=True, since=0):
         with self._lock:
             for e in self.events:
-                if e.severity == "critical" and (not package_scoped
-                                                 or e.package_match):
+                if (e.ts >= since and e.severity == "critical"
+                        and (not package_scoped or e.package_match)):
                     return e
         return None
 

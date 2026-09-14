@@ -89,6 +89,7 @@ Tidak perlu build lokal — **push ke `main` dan GitHub Actions otomatis menghas
 - [Pipeline CI/CD](docs/CI_CD.md)
 - [Protokol Multiplayer](docs/MULTIPLAYER.md)
 - [Performa & Polygon Budget 60 FPS](docs/PERFORMANCE.md)
+- [Asset Pipeline AI → Blender → Godot](docs/ASSET_PIPELINE.md) + prompt library [`prompts/`](prompts/)
 
 ## Lisensi
 

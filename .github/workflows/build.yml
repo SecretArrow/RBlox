@@ -333,11 +333,15 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Lampirkan screenshot ke release
+      - name: Lampirkan screenshot ke release (hanya bila ada konten visual)
         if: success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          gh release upload "${{ steps.rel.outputs.tag }}" emulator-1.png emulator-2.png --clobber
-          echo "Screenshot auto-run dilampirkan ke release ${{ steps.rel.outputs.tag }}"
+          if [ -f screenshot_ok.flag ]; then
+            gh release upload "${{ steps.rel.outputs.tag }}" emulator-1.png emulator-2.png --clobber
+            echo "Screenshot auto-run dilampirkan ke release ${{ steps.rel.outputs.tag }}"
+          else
+            echo "Screenshot emulator hitam (SwiftShader Vulkan, tanpa GPU) — tidak dilampirkan. Bukti visual lihat job 'screenshots'."
+          fi

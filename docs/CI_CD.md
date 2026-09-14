@@ -215,8 +215,13 @@ menguji **APK hasil release yang sudah terbit** — bukan artifact mentah build:
    bisa dilihat tanpa install.
 
 Catatan teknis: renderer project adalah `mobile` (Vulkan). Emulator CI tanpa
-GPU host tidak punya Vulkan, sehingga `rendering_device/fallback_to_opengl3=true`
-membuat Godot otomatis memakai backend OpenGL (Compatibility) saat smoke test —
-perangkat fisik yang mendukung Vulkan tetap memakai jalur Vulkan penuh. Job ini
-dilewati untuk event pull_request dan tetap hijau saat salah satu job rilisan
-di-skip (kondisi `!contains(needs.*.result, 'failure')`).
+GPU host hanya mampu menginisialisasi Vulkan SwiftShader yang merender hitam
+senyap di Godot 4; jalur GL emugl gagal inisialisasi, dan mematikan Vulkan di
+emulator (`-feature -Vulkan`) membuat aplikasi berhenti. Karena itu kegagalan
+render TIDAK menggagalkan smoke test — yang diverifikasi adalah siklus hidup
+proses (install, launch, init engine, tanpa crash, input sentuh hidup).
+Screenshot emulator hanya dilampirkan ke release bila memiliki konten visual
+(>16 warna); bukti visual render asli tetap disediakan job `screenshots`
+(render GL asli 1080p). Job ini dilewati untuk event pull_request dan tetap
+hijau saat salah satu job rilisan di-skip
+(kondisi `!contains(needs.*.result, 'failure')`).

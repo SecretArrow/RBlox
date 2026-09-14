@@ -39,6 +39,7 @@
   "build_anchor": "Anchored",
   "build_close": "Tutup",
   "build_coding": "Coding",
+  "build_limit": "Batas blok tercapai",
   "build_limit_reached": "Batas blok tercapai (4000)",
   "build_no_terrain": "Terrain tidak tersedia",
   "build_place": "Tempatkan",
@@ -85,6 +86,7 @@
   "mat_plastic": "Plastik",
   "mat_wood": "Kayu",
   "menu_avatar": "Avatar",
+  "menu_continue": "Lanjutkan",
   "menu_create": "Buat",
   "menu_multiplayer": "Multiplayer",
   "menu_play": "Main",
@@ -210,6 +212,7 @@
   "toast_hosted": "Room dibuat. Bagikan IP atau tunggu pemain lain.",
   "toast_joined": "Berhasil masuk room.",
   "toast_left": "Keluar dari room.",
+  "toast_session_saved": "Permainan disimpan",
   "tpl_adventure": "Petualangan",
   "tpl_adventure_desc": "Kumpulkan 10 bintang di perbukitan.",
   "tpl_bedwars": "Bed Wars",
@@ -240,8 +243,5 @@
   "ws_import_hint": "Pilih file .myworld, atau salin ke folder user://imports.",
   "ws_my_worlds": "Dunia Saya",
   "ws_templates": "Template",
-  "ws_title": "Pilih Dunia",
-  "menu_continue": "Lanjutkan",
-  "toast_session_saved": "Permainan disimpan",
-  "build_limit": "Batas blok tercapai"
+  "ws_title": "Pilih Dunia"
 }

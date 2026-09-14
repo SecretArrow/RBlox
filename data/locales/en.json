@@ -39,6 +39,7 @@
   "build_anchor": "Anchored",
   "build_close": "Close",
   "build_coding": "Coding",
+  "build_limit": "Block limit reached",
   "build_limit_reached": "Block limit reached (4000)",
   "build_no_terrain": "Terrain unavailable",
   "build_place": "Place",
@@ -85,6 +86,7 @@
   "mat_plastic": "Plastic",
   "mat_wood": "Wood",
   "menu_avatar": "Avatar",
+  "menu_continue": "Continue",
   "menu_create": "Create",
   "menu_multiplayer": "Multiplayer",
   "menu_play": "Play",
@@ -210,6 +212,7 @@
   "toast_hosted": "Room created. Share your IP or wait for players.",
   "toast_joined": "Joined the room.",
   "toast_left": "Left the room.",
+  "toast_session_saved": "Game saved",
   "tpl_adventure": "Adventure",
   "tpl_adventure_desc": "Collect 10 stars across the hills.",
   "tpl_bedwars": "Bed Wars",
@@ -240,8 +243,5 @@
   "ws_import_hint": "Pick a .myworld file, or copy one into user://imports.",
   "ws_my_worlds": "My Worlds",
   "ws_templates": "Templates",
-  "ws_title": "Select World",
-  "menu_continue": "Continue",
-  "toast_session_saved": "Game saved",
-  "build_limit": "Block limit reached"
+  "ws_title": "Select World"
 }

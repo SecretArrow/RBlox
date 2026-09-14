@@ -21,12 +21,16 @@ on:
         default: SMOKE
         type: string
       apk_source:
-        description: "Where the APK comes from: release | godot | gradle"
+        description: "Where the APK comes from: release | artifact | godot | gradle"
         default: release
         type: string
       release_tag:
         description: "Release tag to download the APK from"
         default: dev-build
+        type: string
+      apk_artifact_name:
+        description: "Artifact name from the CALLER run (apk_source=artifact)"
+        default: ""
         type: string
       asset_glob:
         description: "Asset glob when downloading from a release"
@@ -66,6 +70,9 @@ on:
         type: string
       release_tag:
         default: dev-build
+        type: string
+      apk_artifact_name:
+        default: ""
         type: string
       asset_glob:
         default: "*.apk"
@@ -142,6 +149,15 @@ jobs:
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
           echo "src=$SRC"   >> "$GITHUB_OUTPUT"
           echo "tag=$TAG"   >> "$GITHUB_OUTPUT"
+
+      - name: Download APK from caller artifact (pre-publish gate)
+        if: steps.params.outputs.src == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.apk_artifact_name }}
+          path: apk
+          run-id: ${{ github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download APK from release
         if: steps.params.outputs.src == 'release'

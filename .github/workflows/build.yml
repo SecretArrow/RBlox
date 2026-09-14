@@ -231,7 +231,7 @@ jobs:
 
   tag-release:
     name: GitHub Release (tag v*)
-    needs: build
+    needs: [build, smoke-test]
     if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
     runs-on: ubuntu-latest
     outputs:
@@ -258,7 +258,7 @@ jobs:
 
   smoke-test:
     name: Auto-run APK rilisan di emulator (universal autonomous tester)
-    needs: [dev-release, tag-release]
+    needs: [build, dev-release]
     if: >-
       ${{ !cancelled()
           && !contains(needs.*.result, 'failure')
@@ -267,8 +267,9 @@ jobs:
     uses: ./.github/workflows/universal-apk-test.yml
     with:
       mode: SMOKE
-      apk_source: release
-      release_tag: ${{ needs.tag-release.outputs.tag || needs.dev-release.outputs.tag || 'dev-build' }}
-      attach_to_release: true
+      apk_source: ${{ startsWith(github.ref, 'refs/tags/') && 'artifact' || 'release' }}
+      apk_artifact_name: RBlox-Android
+      release_tag: ${{ needs.dev-release.outputs.tag || 'dev-build' }}
+      attach_to_release: ${{ !startsWith(github.ref, 'refs/tags/') }}
       autofix: false
     secrets: inherit

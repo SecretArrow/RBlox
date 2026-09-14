@@ -327,7 +327,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: RBlox-Emulator-Smoke
-          path: emulator-1.png
+          path: |
+            emulator-1.png
+            emulator-2.png
           retention-days: 30
           if-no-files-found: error
 

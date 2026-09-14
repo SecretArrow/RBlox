@@ -29,6 +29,9 @@ if ! adb install -r "$APK"; then
   exit 1
 fi
 
+# Suppress dialog sistem "Viewing full screen" (overlay immersive-mode first-launch)
+adb shell settings put secure immersive_mode_confirmations confirmed || true
+
 echo "== Launch =="
 adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
 
@@ -86,8 +89,13 @@ fi
 adb exec-out screencap -p > emulator-1.png
 echo "Screenshot 1: $(du -h emulator-1.png | cut -f1)"
 
-# 6) Interaksi sentuh (uji input; bisa membuka gameplay) lalu screenshot 2
-adb shell input tap 540 1200 || true
+# 6) Interaksi sentuh di tengah layar aktif (rotasi-aware) lalu screenshot 2
+adb exec-out screencap -p > /tmp/probe.png
+DIM=$(file /tmp/probe.png | sed -E 's/.*PNG image data, ([0-9]+) x ([0-9]+).*/\1 \2/')
+FW=$(echo "$DIM" | cut -d' ' -f1)
+FH=$(echo "$DIM" | cut -d' ' -f2)
+echo "Resolusi layar aktif: ${FW}x${FH} -> tap ($((FW/2)), $((FH/2)))"
+adb shell input tap "$((FW/2))" "$((FH/2))" || true
 sleep 15
 adb exec-out screencap -p > emulator-2.png
 echo "Screenshot 2: $(du -h emulator-2.png | cut -f1)"

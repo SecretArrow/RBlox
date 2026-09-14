@@ -275,11 +275,15 @@ jobs:
           echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
 
       - name: Create and boot emulator
+        env:
+          ANDROID_AVD_HOME: ${{ github.workspace }}/.android/avd
         run: |
           SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          mkdir -p "$ANDROID_AVD_HOME"
           echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd \
             -n ci -k "system-images;android-${{ matrix.api }};${{ matrix.tag }};${{ matrix.abi }}" \
             -d pixel_5 --force
+          echo "== AVD list =="; "$SDK/emulator/emulator" -list-avds || true
           nohup "$SDK/emulator/emulator" -avd ci -no-window -gpu swiftshader_indirect \
             -noaudio -no-boot-anim -camera-back none -camera-front none \
             -memory 3072 -cores 2 -no-snapshot -accel on > /tmp/emulator.log 2>&1 &

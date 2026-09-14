@@ -63,6 +63,7 @@ var _active_part: String = "shirt"
 var _part_group: ButtonGroup = null
 var _toast_layer: Control = null
 var _saving: bool = false
+var _tri_label: Label = null
 
 
 func _ready() -> void:
@@ -118,7 +119,6 @@ func _build_3d() -> Control:
         cont.stretch = true
         cont.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         cont.size_flags_vertical = Control.SIZE_EXPAND_FILL
-        cont.size_flags_stretch_ratio = 0.45
         cont.gui_input.connect(_on_view_input)
         var sv := SubViewport.new()
         sv.own_world_3d = true
@@ -145,7 +145,21 @@ func _build_3d() -> Control:
         _holder = Node3D.new()
         sv.add_child(_holder)
         _spawn_rig()
-        return cont
+        # Kolom kiri dibungkus VBox: preview + counter tris (budget avatar).
+        var box := VBoxContainer.new()
+        box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+        box.size_flags_stretch_ratio = 0.45
+        box.add_theme_constant_override("separation", 2)
+        cont.size_flags_stretch_ratio = 1.0
+        box.add_child(cont)
+        _tri_label = Label.new()
+        _tri_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        _tri_label.add_theme_font_size_override("font_size", 12)
+        _tri_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        box.add_child(_tri_label)
+        _refresh_tris()
+        return box
 
 
 func _spawn_rig() -> void:
@@ -156,6 +170,28 @@ func _spawn_rig() -> void:
                 _rig = AvatarBuilder.build(_cfg)
                 if _rig != null:
                         _holder.add_child(_rig)
+        _refresh_tris()
+
+
+## Total tris avatar (badan + seluruh aksesoris) vs budget kategori avatar.
+func _refresh_tris() -> void:
+        if _tri_label == null or not is_instance_valid(_tri_label):
+                return
+        var t := 0
+        if _rig != null and is_instance_valid(_rig):
+                t = int(PolyBudget.audit(_rig)["total"])
+        var v := PolyBudget.verdict("avatar", t)
+        _tri_label.text = "≈ %d / %s tris" % [t, _fmt_limit(int(v["limit"]))]
+        var col := Color(0.55, 0.85, 0.6)
+        if v["level"] == 1:
+                col = Color(1.0, 0.82, 0.35)
+        elif v["level"] == 2:
+                col = Color(1.0, 0.45, 0.38)
+        _tri_label.add_theme_color_override("font_color", col)
+
+
+func _fmt_limit(n: int) -> String:
+        return "%d.%03d" % [n / 1000, n % 1000]
 
 
 func _on_view_input(ev: InputEvent) -> void:

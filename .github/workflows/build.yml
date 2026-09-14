@@ -115,6 +115,12 @@ jobs:
             echo "::error::MMChunks functional test gagal"
             exit 1
           fi
+          # EN: functional test of PolyBudget polygon budget system (v0.2.2)
+          timeout 120 godot --headless res://tools/test_budget.tscn 2>&1 | tee budget.log
+          if ! grep -q "BUDGET_TEST_PASS" budget.log; then
+            echo "::error::PolyBudget functional test gagal"
+            exit 1
+          fi
 
       - name: Export APK universal
         run: |

@@ -88,6 +88,7 @@ Tidak perlu build lokal — **push ke `main` dan GitHub Actions otomatis menghas
 - [Rencana Pengembangan MVP → Alpha → v1.0](docs/ROADMAP.md)
 - [Pipeline CI/CD](docs/CI_CD.md)
 - [Protokol Multiplayer](docs/MULTIPLAYER.md)
+- [Performa & Polygon Budget 60 FPS](docs/PERFORMANCE.md)
 
 ## Lisensi
 

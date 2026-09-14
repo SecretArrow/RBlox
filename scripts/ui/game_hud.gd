@@ -258,8 +258,31 @@ func _glass(radius: int, margin_v: float) -> StyleBoxFlat:
 
 
 func _poll_fps() -> void:
-        if _fps_label != null and is_instance_valid(_fps_label):
-                _fps_label.text = "%d FPS" % Engine.get_frames_per_second()
+        if _fps_label == null or not is_instance_valid(_fps_label):
+                return
+        var fps := Engine.get_frames_per_second()
+        var tris := PolyBudget.estimate_onscreen_tris()
+        _fps_label.text = "%d FPS • %s tris" % [fps, _fmt_tris(tris)]
+        # Kode warna budget scene: putih <=100k, kuning <=200k, merah >200k.
+        var lvl := PolyBudget.scene_level(tris)
+        var col := Color(1, 1, 1, 0.78)
+        if lvl == 1:
+                col = Color(1.0, 0.82, 0.35)
+        elif lvl == 2:
+                col = Color(1.0, 0.45, 0.38)
+        _fps_label.add_theme_color_override("font_color", col)
+
+
+## Format ringkas jumlah tris: 840 -> "840", 8400 -> "8.4k", 125000 -> "125k",
+## 1240000 -> "1.2M" (mengikuti gaya counter poly tooling game engine).
+func _fmt_tris(n: int) -> String:
+        if n >= 1_000_000:
+                return "%.1fM" % (float(n) / 1_000_000.0)
+        if n >= 10_000:
+                return "%dk" % (n / 1000)
+        if n >= 1_000:
+                return "%.1fk" % (float(n) / 1000.0)
+        return str(n)
 
 
 func _small_button(text: String, handler: Callable) -> Button:

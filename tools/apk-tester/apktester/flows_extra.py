@@ -44,12 +44,11 @@ def flow_lifecycle_core(ctx):
                     "app did not return to foreground after background "
                     "(pid alive=%s)" % bool(pid_now), res.name)
         return res
-    if not _check_alive(ctx, res, "background/foreground"):
+    if not ctx.adb.pidof(ctx.package):
         # Distinguish OS reclaim (no crash evidence) from a real crash: if the
         # process died with ZERO crash/ANR events in this flow, relaunch cold
         # and accept a graceful recovery.
-        if not ctx.adb.pidof(ctx.package) and \
-                ctx.monitor.has_critical(since=res.ts_start) is None:
+        if ctx.monitor.has_critical(since=res.ts_start) is None:
             res.notes.append("process died right after resume with no crash "
                              "evidence in logcat -> OS reclaim, verifying cold "
                              "restart")
@@ -57,14 +56,26 @@ def flow_lifecycle_core(ctx):
             time.sleep(5)
             if info["resumed"] and ctx.adb.pidof(ctx.package):
                 res.status = "warned"
-                res.failed_action = None
                 res.notes.append("cold restart after reclaim OK — graceful")
                 ctx.finding("minor", "background-reclaim",
                             "system reclaimed background process at resume; "
                             "cold restart succeeded (no crash in logcat)",
                             res.name)
-                _check_alive(ctx, res, "reclaim-restart")
+                if not ctx.adb.pidof(ctx.package):
+                    res.status = "failed"
+                    res.failed_action = "reclaim-restart"
                 return res
+            res.status = "failed"
+            res.failed_action = "reclaim-restart"
+            ctx.finding("critical", "lifecycle",
+                        "process died at resume and cold restart also failed",
+                        res.name)
+            return res
+        res.status = "failed"
+        res.failed_action = "background/foreground"
+        ctx.finding("critical", "crash",
+                    "app crashed during background/foreground transition",
+                    res.name)
         return res
     # cold restart
     ctx.adb.force_stop(ctx.package)

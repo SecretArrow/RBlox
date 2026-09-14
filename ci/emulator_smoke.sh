@@ -1,17 +1,26 @@
 #!/usr/bin/env bash
 # Auto-run smoke test APK rilisan di Android emulator (CI).
-# Alur: install -> launch -> tunggu engine init -> cek crash -> 2 screenshot -> cek masih hidup.
+# Alur: install -> launch (paksa backend OpenGL) -> tunggu engine init -> cek crash
+#       -> 2 screenshot (anti-hitam) -> cek masih hidup.
 # Lulus = EMULATOR_SMOKE_PASS. Screenshot emulator-1.png / emulator-2.png di workspace.
+#
+# Catatan backend: emulator CI punya Vulkan SwiftShader yang membuat Godot (renderer
+# "mobile") tampil HITAM senyap, sementara menonaktifkan Vulkan di emulator
+# (-feature -Vulkan) membuat aplikasi mati. Solusi: launch dengan command-line param
+# intent resmi Godot (GodotActivity.kt: EXTRA_COMMAND_LINE_PARAMS = "command_line_params")
+# untuk memaksa jalur OpenGL Compatibility — sama seperti perangkat low-end nyata.
 set -euo pipefail
 
 PKG="com.secretarrow.rblox"
+ACTIVITY="$PKG/com.godot.game.GodotApp"
 APK_DIR="${APK_DIR:-apk}"
 
 # Tolak screenshot hitam kosong (tanda render gagal di emulator)
 check_not_black() {
   local f="$1"
   if command -v identify >/dev/null 2>&1; then
-    local COLORS=$(identify -format "%k" "$f" 2>/dev/null || echo 0)
+    local COLORS
+    COLORS=$(identify -format "%k" "$f" 2>/dev/null || echo 0)
     echo "Warna unik $f: ${COLORS:-0}"
     if [ "${COLORS:-0}" -lt 16 ]; then
       echo "::error::$f hitam kosong (${COLORS:-0} warna) — render gagal di emulator"
@@ -19,6 +28,17 @@ check_not_black() {
     fi
   fi
   return 0
+}
+
+# pidof exit 1 bila proses mati — jangan biarkan pipefail membunuh script diam-diam
+alive() {
+  adb shell pidof "$PKG" 2>/dev/null | tr -d '\r\n ' || true
+}
+
+dump_diag() {
+  echo "== Diagnostik logcat =="
+  adb logcat -d -b crash 2>/dev/null | tail -50 || true
+  adb logcat -d 2>/dev/null | grep -iE "godot|FATAL EXCEPTION" | tail -30 || true
 }
 
 echo "== Perangkat =="
@@ -46,8 +66,10 @@ fi
 # Suppress dialog sistem "Viewing full screen" (overlay immersive-mode first-launch)
 adb shell settings put secure immersive_mode_confirmations confirmed || true
 
-echo "== Launch =="
-adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
+echo "== Launch (paksa backend OpenGL Compatibility) =="
+adb shell am start -n "$ACTIVITY" \
+  --esa command_line_params "--rendering-method,gl_compatibility,--rendering-driver,opengl3"
+sleep 3
 
 # 1) Tunggu aktivitas game menjadi ResumedActivity (maks ~120 dtk)
 BOOT=0
@@ -60,7 +82,7 @@ done
 if [ "$BOOT" != "1" ]; then
   echo "::error::Aktivitas game tidak pernah menjadi ResumedActivity"
   adb shell dumpsys activity activities 2>/dev/null | head -60 || true
-  adb logcat -d 2>/dev/null | tail -120 || true
+  dump_diag
   exit 1
 fi
 
@@ -72,26 +94,25 @@ for i in $(seq 1 30); do
 done
 if [ "$GODOT_LOG" != "1" ]; then
   echo "::error::Log 'Godot Engine v...' tidak ditemukan — engine gagal init"
-  adb logcat -d 2>/dev/null | tail -150 || true
+  dump_diag
   exit 1
 fi
 echo "== Log engine =="
 adb logcat -d 2>/dev/null | grep -m3 "Godot Engine" || true
 echo "== Backend render =="
-adb logcat -d 2>/dev/null | grep -iE "falling back|opengl|vulkan" | head -8 || true
+adb logcat -d 2>/dev/null | grep -iE "falling back|opengl|vulkan" | grep -ivE "vold|nativeloader|init|signature" | head -8 || true
 
 # 3) Beri waktu scene utama termuat & dirender (renderer software di emulator lambat)
 sleep 30
 
-PID=$(adb shell pidof "$PKG" | tr -d '\r\n ')
+# 4) Proses harus tetap hidup + tidak ada crash
+PID=$(alive)
 echo "PID: ${PID:-<mati>}"
 if [ -z "$PID" ]; then
   echo "::error::Proses game mati setelah boot (crash?)"
-  adb logcat -d -b crash 2>/dev/null | tail -80 || true
+  dump_diag
   exit 1
 fi
-
-# 4) Cek crash buffer khusus paket game
 CRASH=$(adb logcat -d -b crash 2>/dev/null | grep -c "$PKG" || true)
 if [ "${CRASH:-0}" != "0" ]; then
   echo "::error::Crash terdeteksi di logcat crash-buffer ($CRASH baris)"
@@ -103,7 +124,7 @@ fi
 adb exec-out screencap -p > emulator-1.png
 echo "Screenshot 1: $(du -h emulator-1.png | cut -f1)"
 if ! check_not_black emulator-1.png; then
-  adb logcat -d 2>/dev/null | grep -iE "godot|opengl|vulkan" | tail -40 || true
+  dump_diag
   exit 1
 fi
 
@@ -118,15 +139,15 @@ sleep 15
 adb exec-out screencap -p > emulator-2.png
 echo "Screenshot 2: $(du -h emulator-2.png | cut -f1)"
 if ! check_not_black emulator-2.png; then
-  adb logcat -d 2>/dev/null | grep -iE "godot|opengl|vulkan" | tail -40 || true
+  dump_diag
   exit 1
 fi
 
 # 7) Pastikan proses masih hidup setelah interaksi
-PID2=$(adb shell pidof "$PKG" | tr -d '\r\n ')
+PID2=$(alive)
 if [ -z "$PID2" ]; then
   echo "::error::Proses game mati setelah interaksi sentuh"
-  adb logcat -d -b crash 2>/dev/null | tail -80 || true
+  dump_diag
   exit 1
 fi
 

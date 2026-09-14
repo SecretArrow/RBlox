@@ -210,6 +210,8 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.reltag.outputs.tag }}
     steps:
       - name: Download APKs
         uses: actions/download-artifact@v4
@@ -223,12 +225,17 @@ jobs:
         run: |
           gh release delete dev-build --yes --cleanup-tag 2>/dev/null || true
           gh release create dev-build build/RBlox-*.apk --prerelease --title "RBlox Dev Build" --notes "Build otomatis dari commit $GITHUB_SHA (split per ABI).\n\nPilih sesuai CPU HP:\n- arm64-v8a → HP modern (disarankan)\n- armeabi-v7a → HP lama\n- x86_64 → emulator/ChromeOS\n- universal → semua arsitektur\n\nInstall: unduh APK, izinkan install dari sumber tidak dikenal. 100% gratis, tanpa iklan."
+      - name: Catat tag rilisan
+        id: reltag
+        run: echo "tag=dev-build" >> "$GITHUB_OUTPUT"
 
   tag-release:
     name: GitHub Release (tag v*)
     needs: build
     if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.settag.outputs.tag }}
     steps:
       - name: Download APKs
         uses: actions/download-artifact@v4
@@ -236,13 +243,99 @@ jobs:
           name: RBlox-Android
           path: build
       - name: Create release (split per ABI)
+        id: settag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
           TAG="${GITHUB_REF_NAME}"
           if [ "$TAG" = "main" ] || [ -z "$TAG" ]; then TAG="v$(date +%Y%m%d%H%M)-manual"; fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           sleep 10
           gh release view "$TAG" >/dev/null 2>&1 || \
             gh release create "$TAG" --title "RBlox $TAG — split per ABI" --generate-notes
           gh release upload "$TAG" build/RBlox-*.apk --clobber
+
+  smoke-test:
+    name: Auto-run APK rilisan di emulator Android
+    needs: [dev-release, tag-release]
+    if: >-
+      ${{ !cancelled()
+          && !contains(needs.*.result, 'failure')
+          && !contains(needs.*.result, 'cancelled')
+          && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Tentukan tag rilisan yang diuji
+        id: rel
+        run: |
+          TAG="${{ needs.tag-release.outputs.tag }}"
+          if [ -z "$TAG" ]; then TAG="${{ needs.dev-release.outputs.tag }}"; fi
+          if [ -z "$TAG" ]; then TAG="dev-build"; fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "APK rilisan yang diuji: $TAG"
+
+      - name: Unduh APK hasil release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -e
+          mkdir -p apk
+          TAG="${{ steps.rel.outputs.tag }}"
+          gh release download "$TAG" --dir apk --pattern "RBlox-x86_64.apk" || \
+            gh release download "$TAG" --dir apk --pattern "RBlox-universal.apk"
+          ls -lh apk
+
+      - name: Bebaskan ruang disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      - name: Aktifkan KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -al /dev/kvm
+
+      - name: Cache system image emulator
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/system-images
+          key: emulator-api34-google_apis-x86_64
+
+      - name: Jalankan APK di Android emulator (install, launch, cek crash, screenshot)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          cores: 4
+          ram-size: 3072M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: true
+          script: bash ci/emulator_smoke.sh
+
+      - name: Unggah artifact bukti screenshot
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RBlox-Emulator-Smoke
+          path: emulator-1.png
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Lampirkan screenshot ke release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release upload "${{ steps.rel.outputs.tag }}" emulator-1.png emulator-2.png --clobber
+          echo "Screenshot auto-run dilampirkan ke release ${{ steps.rel.outputs.tag }}"

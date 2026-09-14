@@ -196,3 +196,27 @@ dipertahankan apa adanya). Workflow CI juga menjalankan job `screenshots`
 paralel yang mengunggah kelima PNG sebagai artifact `RBlox-Screenshots`
 pada setiap push main. Catatan: `xvfb-run` butuh `xauth` yang mungkin tak
 tersedia; pakai `Xvfb` langsung seperti di atas.
+
+## Auto-run APK rilisan di emulator (job `smoke-test`)
+
+Setiap push main (dev pre-release `dev-build`) dan tag `v*`, job `smoke-test`
+menguji **APK hasil release yang sudah terbit** — bukan artifact mentah build:
+
+1. `gh release download` APK `RBlox-x86_64.apk` (fallback `RBlox-universal.apk`)
+   dari tag rilisan yang diuji (`dev-build` atau tag `v*`).
+2. Android emulator (API 34, google_apis, x86_64, KVM, Pixel 5) dinyalakan
+   headless (`-no-window -gpu swiftshader_indirect`).
+3. `ci/emulator_smoke.sh`: `adb install` → launch via monkey → tunggu aktivitas
+   game jadi ResumedActivity → tunggu log `Godot Engine v...` → cek crash-buffer
+   logcat paket `com.secretarrow.rblox` → screenshot → tap layar → screenshot →
+   pastikan proses masih hidup. Lulus = `EMULATOR_SMOKE_PASS`.
+4. Screenshot `emulator-1.png` / `emulator-2.png` diunggah sebagai artifact
+   `RBlox-Emulator-Smoke` **dan dilampirkan ke release** (`--clobber`) sehingga
+   bisa dilihat tanpa install.
+
+Catatan teknis: renderer project adalah `mobile` (Vulkan). Emulator CI tanpa
+GPU host tidak punya Vulkan, sehingga `rendering_device/fallback_to_opengl3=true`
+membuat Godot otomatis memakai backend OpenGL (Compatibility) saat smoke test —
+perangkat fisik yang mendukung Vulkan tetap memakai jalur Vulkan penuh. Job ini
+dilewati untuk event pull_request dan tetap hijau saat salah satu job rilisan
+di-skip (kondisi `!contains(needs.*.result, 'failure')`).

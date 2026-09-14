@@ -93,7 +93,6 @@ on:
 
 permissions:
   contents: write
-  actions: read
 
 concurrency:
   group: universal-apk-test-${{ github.ref }}

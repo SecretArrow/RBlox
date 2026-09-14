@@ -282,9 +282,13 @@ jobs:
             -d pixel_5 --force
           nohup "$SDK/emulator/emulator" -avd ci -no-window -gpu swiftshader_indirect \
             -noaudio -no-boot-anim -camera-back none -camera-front none \
-            -memory 3072 -cores 2 -no-snapshot > /tmp/emulator.log 2>&1 &
-          adb wait-for-device
-          timeout 900 bash -c 'while [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" != "1" ]; do sleep 5; done'
+            -memory 3072 -cores 2 -no-snapshot -accel on > /tmp/emulator.log 2>&1 &
+          sleep 10
+          echo "== emulator.log (awal) =="; head -25 /tmp/emulator.log || true
+          timeout 600 adb wait-for-device \
+            || { echo "::error::adb wait-for-device timeout"; tail -60 /tmp/emulator.log; exit 1; }
+          timeout 900 bash -c 'while [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" != "1" ]; do sleep 5; done' \
+            || { echo "::error::emulator boot timeout (900s)"; adb devices -l; tail -80 /tmp/emulator.log; exit 1; }
           adb devices -l
           adb shell settings put global window_animation_scale 0.0 || true
           adb shell settings put global transition_animation_scale 0.0 || true

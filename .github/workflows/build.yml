@@ -318,7 +318,7 @@ jobs:
           profile: pixel_5
           cores: 4
           ram-size: 3072M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
           disable-animations: true
           script: bash ci/emulator_smoke.sh
 

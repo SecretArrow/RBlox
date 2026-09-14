@@ -7,6 +7,20 @@ set -euo pipefail
 PKG="com.secretarrow.rblox"
 APK_DIR="${APK_DIR:-apk}"
 
+# Tolak screenshot hitam kosong (tanda render gagal di emulator)
+check_not_black() {
+  local f="$1"
+  if command -v identify >/dev/null 2>&1; then
+    local COLORS=$(identify -format "%k" "$f" 2>/dev/null || echo 0)
+    echo "Warna unik $f: ${COLORS:-0}"
+    if [ "${COLORS:-0}" -lt 16 ]; then
+      echo "::error::$f hitam kosong (${COLORS:-0} warna) — render gagal di emulator"
+      return 1
+    fi
+  fi
+  return 0
+}
+
 echo "== Perangkat =="
 adb devices -l
 echo "Android: $(adb shell getprop ro.build.version.release | tr -d '\r') (SDK $(adb shell getprop ro.build.version.sdk | tr -d '\r'))"
@@ -85,9 +99,13 @@ if [ "${CRASH:-0}" != "0" ]; then
   exit 1
 fi
 
-# 5) Screenshot 1 — kondisi menu utama
+# 5) Screenshot 1 — kondisi menu utama (wajib ada konten, bukan hitam)
 adb exec-out screencap -p > emulator-1.png
 echo "Screenshot 1: $(du -h emulator-1.png | cut -f1)"
+if ! check_not_black emulator-1.png; then
+  adb logcat -d 2>/dev/null | grep -iE "godot|opengl|vulkan" | tail -40 || true
+  exit 1
+fi
 
 # 6) Interaksi sentuh di tengah layar aktif (rotasi-aware) lalu screenshot 2
 adb exec-out screencap -p > /tmp/probe.png
@@ -99,6 +117,10 @@ adb shell input tap "$((FW/2))" "$((FH/2))" || true
 sleep 15
 adb exec-out screencap -p > emulator-2.png
 echo "Screenshot 2: $(du -h emulator-2.png | cut -f1)"
+if ! check_not_black emulator-2.png; then
+  adb logcat -d 2>/dev/null | grep -iE "godot|opengl|vulkan" | tail -40 || true
+  exit 1
+fi
 
 # 7) Pastikan proses masih hidup setelah interaksi
 PID2=$(adb shell pidof "$PKG" | tr -d '\r\n ')

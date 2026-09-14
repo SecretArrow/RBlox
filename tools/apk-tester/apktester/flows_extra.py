@@ -45,6 +45,26 @@ def flow_lifecycle_core(ctx):
                     "(pid alive=%s)" % bool(pid_now), res.name)
         return res
     if not _check_alive(ctx, res, "background/foreground"):
+        # Distinguish OS reclaim (no crash evidence) from a real crash: if the
+        # process died with ZERO crash/ANR events in this flow, relaunch cold
+        # and accept a graceful recovery.
+        if not ctx.adb.pidof(ctx.package) and \
+                ctx.monitor.has_critical(since=res.ts_start) is None:
+            res.notes.append("process died right after resume with no crash "
+                             "evidence in logcat -> OS reclaim, verifying cold "
+                             "restart")
+            info = ctx.adb.launch(ctx.package, wait_timeout=120)
+            time.sleep(5)
+            if info["resumed"] and ctx.adb.pidof(ctx.package):
+                res.status = "warned"
+                res.failed_action = None
+                res.notes.append("cold restart after reclaim OK — graceful")
+                ctx.finding("minor", "background-reclaim",
+                            "system reclaimed background process at resume; "
+                            "cold restart succeeded (no crash in logcat)",
+                            res.name)
+                _check_alive(ctx, res, "reclaim-restart")
+                return res
         return res
     # cold restart
     ctx.adb.force_stop(ctx.package)

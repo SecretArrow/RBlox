@@ -232,7 +232,12 @@ jobs:
   tag-release:
     name: GitHub Release (tag v*)
     needs: [build, smoke-test]
-    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
+    if: >-
+      ${{ !cancelled()
+          && needs.build.result == 'success'
+          && needs.smoke-test.result == 'success'
+          && (startsWith(github.ref, 'refs/tags/v')
+              || github.event.inputs.create_release == 'true') }}
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.settag.outputs.tag }}

@@ -32,6 +32,9 @@ class Adb:
                 r = subprocess.run(cmd, capture_output=True, timeout=timeout)
             except subprocess.TimeoutExpired:
                 raise DeviceError("adb timeout: %s" % " ".join(args))
+            if not check:
+                # tolerant mode: caller decides what output means
+                return r.stdout if binary else r.stdout.decode("utf-8", "replace")
             if r.returncode == 0:
                 return r.stdout if binary else r.stdout.decode("utf-8", "replace")
             err = r.stderr.decode("utf-8", "replace").lower()

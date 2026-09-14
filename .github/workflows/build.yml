@@ -257,91 +257,18 @@ jobs:
           gh release upload "$TAG" build/RBlox-*.apk --clobber
 
   smoke-test:
-    name: Auto-run APK rilisan di emulator Android
+    name: Auto-run APK rilisan di emulator (universal autonomous tester)
     needs: [dev-release, tag-release]
     if: >-
       ${{ !cancelled()
           && !contains(needs.*.result, 'failure')
           && !contains(needs.*.result, 'cancelled')
           && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Tentukan tag rilisan yang diuji
-        id: rel
-        run: |
-          TAG="${{ needs.tag-release.outputs.tag }}"
-          if [ -z "$TAG" ]; then TAG="${{ needs.dev-release.outputs.tag }}"; fi
-          if [ -z "$TAG" ]; then TAG="dev-build"; fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "APK rilisan yang diuji: $TAG"
-
-      - name: Unduh APK hasil release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          set -e
-          mkdir -p apk
-          TAG="${{ steps.rel.outputs.tag }}"
-          gh release download "$TAG" --dir apk --pattern "RBlox-x86_64.apk" || \
-            gh release download "$TAG" --dir apk --pattern "RBlox-universal.apk"
-          ls -lh apk
-
-      - name: Bebaskan ruang disk
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
-          df -h /
-
-      - name: Aktifkan KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          ls -al /dev/kvm
-
-      - name: Cache system image emulator
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/lib/android/sdk/system-images
-          key: emulator-api34-google_apis-x86_64
-
-      - name: Jalankan APK di Android emulator (install, launch, cek crash, screenshot)
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          profile: pixel_5
-          cores: 4
-          ram-size: 3072M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
-          disable-animations: true
-          script: bash ci/emulator_smoke.sh
-
-      - name: Unggah artifact bukti screenshot
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: RBlox-Emulator-Smoke
-          path: |
-            emulator-1.png
-            emulator-2.png
-          retention-days: 30
-          if-no-files-found: error
-
-      - name: Lampirkan screenshot ke release (hanya bila ada konten visual)
-        if: success()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          if [ -f screenshot_ok.flag ]; then
-            gh release upload "${{ steps.rel.outputs.tag }}" emulator-1.png emulator-2.png --clobber
-            echo "Screenshot auto-run dilampirkan ke release ${{ steps.rel.outputs.tag }}"
-          else
-            echo "Screenshot emulator hitam (SwiftShader Vulkan, tanpa GPU) — tidak dilampirkan. Bukti visual lihat job 'screenshots'."
-          fi
+    uses: ./.github/workflows/universal-apk-test.yml
+    with:
+      mode: SMOKE
+      apk_source: release
+      release_tag: ${{ needs.tag-release.outputs.tag || needs.dev-release.outputs.tag || 'dev-build' }}
+      attach_to_release: true
+      autofix: false
+    secrets: inherit

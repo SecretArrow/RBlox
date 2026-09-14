@@ -1,0 +1,427 @@
+name: Universal APK Autonomous Test
+
+# ANY APK -> DISCOVER -> TEST -> CRASH DETECT -> DIAGNOSE
+#          -> AUTO-FIX WHEN SOURCE EXISTS -> REBUILD -> RETEST
+#          -> REGRESSION TEST -> RELEASE GATE
+#
+# Nothing about the app is hardcoded: package, activity, screens, features
+# are discovered from the APK itself (tools/apk-tester).
+#
+# Triggers:
+#  - workflow_dispatch : manual run, pick mode + APK source
+#  - workflow_call     : reusable release gate for build.yml
+#  - schedule          : nightly DEEP exploration of the released APK with
+#                        autonomous repair loop (fixes pushed to main)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Test mode: SMOKE | STANDARD | DEEP | RELEASE"
+        default: SMOKE
+        type: string
+      apk_source:
+        description: "Where the APK comes from: release | godot | gradle"
+        default: release
+        type: string
+      release_tag:
+        description: "Release tag to download the APK from"
+        default: dev-build
+        type: string
+      asset_glob:
+        description: "Asset glob when downloading from a release"
+        default: "*.apk"
+        type: string
+      prefer_abi:
+        description: "Preferred ABI for the emulator"
+        default: x86_64
+        type: string
+      matrix_json:
+        description: "Emulator matrix JSON ('auto' = per-mode default)"
+        default: auto
+        type: string
+      seed:
+        description: "Deterministic exploration seed"
+        default: "42"
+        type: string
+      autofix:
+        description: "Enable autonomous repair loop (needs source + build)"
+        default: false
+        type: boolean
+      push_fixes:
+        description: "Push successful fixes to main (repair loop output)"
+        default: false
+        type: boolean
+      attach_to_release:
+        description: "Upload non-black screenshots to the tested release"
+        default: false
+        type: boolean
+  workflow_call:
+    inputs:
+      mode:
+        default: SMOKE
+        type: string
+      apk_source:
+        default: release
+        type: string
+      release_tag:
+        default: dev-build
+        type: string
+      asset_glob:
+        default: "*.apk"
+        type: string
+      prefer_abi:
+        default: x86_64
+        type: string
+      matrix_json:
+        default: auto
+        type: string
+      seed:
+        default: "42"
+        type: string
+      autofix:
+        default: false
+        type: boolean
+      push_fixes:
+        default: false
+        type: boolean
+      attach_to_release:
+        default: false
+        type: boolean
+  schedule:
+    - cron: "0 3 * * *"   # nightly autonomous deep test + repair
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: universal-apk-test-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: "4.4.1"
+  PYTHONPATH: ${{ github.workspace }}/tools/apk-tester
+
+jobs:
+  unit-tests:
+    name: Static checks + unit tests (tester itself)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile + unit tests
+        run: |
+          python3 -m py_compile tools/apk-tester/apktester/*.py tools/apk-tester/apktester/tests/*.py
+          python3 -m unittest discover -s tools/apk-tester/apktester/tests -t tools/apk-tester
+
+  build-apk:
+    name: Obtain release APK
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    outputs:
+      matrix: ${{ steps.matrix.outputs.json }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve parameters
+        id: params
+        run: |
+          MODE="${{ inputs.mode }}"
+          SRC="${{ inputs.apk_source }}"
+          TAG="${{ inputs.release_tag }}"
+          [ -n "$MODE" ] || MODE=SMOKE
+          [ -n "$SRC" ]  || SRC=release
+          [ -n "$TAG" ]  || TAG=dev-build
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            MODE="DEEP"; SRC="release"; TAG="dev-build"
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "src=$SRC"   >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG"   >> "$GITHUB_OUTPUT"
+
+      - name: Download APK from release
+        if: steps.params.outputs.src == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p apk
+          gh release download "${{ steps.params.outputs.tag }}" --dir apk \
+            --pattern "${{ inputs.asset_glob || '*.apk' }}" || \
+            gh release download "${{ steps.params.outputs.tag }}" --dir apk
+          ls -lh apk
+
+      - name: Setup Java 17 (build-from-source paths)
+        if: steps.params.outputs.src != 'release'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build with Gradle (generic Android project)
+        if: steps.params.outputs.src == 'gradle'
+        run: |
+          ./gradlew --no-daemon assembleRelease || ./gradlew --no-daemon assembleDebug
+          mkdir -p apk
+          find . -path ./apk -prune -o -name "*.apk" -print | while read -r f; do
+            cp "$f" apk/
+          done
+          ls -lh apk
+
+      - name: Install Godot (build-from-source path)
+        if: steps.params.outputs.src == 'godot'
+        run: |
+          set -e
+          V="${GODOT_VERSION}"
+          curl -L --retry 3 -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_linux.x86_64.zip"
+          curl -L --retry 3 -o /tmp/templates.tpz "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_export_templates.tpz"
+          unzip -o /tmp/godot.zip -d /tmp/godotbin
+          sudo mv /tmp/godotbin/Godot_v${V}-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          mkdir -p ~/.local/share/godot/export_templates/${V}.stable
+          unzip -o /tmp/templates.tpz -d /tmp/tpl
+          mv /tmp/tpl/templates/* ~/.local/share/godot/export_templates/${V}.stable/
+          # keystore + Android build template so the export is installable
+          mkdir -p ~/.android android/build
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" \
+            -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          sed -i "s|keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|; s|keystore/debug_user=\"\"|keystore/debug_user=\"androiddebugkey\"|; s|keystore/debug_password=\"\"|keystore/debug_password=\"android\"|; s|keystore/release=\"\"|keystore/release=\"$HOME/.android/debug.keystore\"|; s|keystore/release_user=\"\"|keystore/release_user=\"androiddebugkey\"|; s|keystore/release_password=\"\"|keystore/release_password=\"android\"|" export_presets.cfg
+          TPLDIR="$HOME/.local/share/godot/export_templates/${V}.stable"
+          unzip -o "$TPLDIR/android_source.zip" -d android/build
+          echo "${V}.stable" > android/.build_version
+          touch android/build/.gdignore
+
+      - name: Build with Godot (generic Godot Android project)
+        if: steps.params.outputs.src == 'godot'
+        run: |
+          set -e
+          mkdir -p build apk
+          godot --headless --import --path "$PWD"
+          P=$(grep -oP 'name="\K[^"]+(?=")' export_presets.cfg | grep -i android | head -1)
+          [ -n "$P" ] || P="Android"
+          godot --headless --export-release "$P" build/app.apk --path "$PWD" \
+            || godot --headless --export-debug "$P" build/app.apk --path "$PWD"
+          cp build/*.apk apk/
+          ls -lh apk
+
+      - name: Compute emulator matrix
+        id: matrix
+        run: |
+          MODE="${{ steps.params.outputs.mode }}"
+          IN="${{ inputs.matrix_json }}"
+          python3 - "$IN" "$MODE" <<'EOF' > matrix.json
+          import json, sys
+          inp, mode = sys.argv[1], sys.argv[2]
+          if inp and inp != "auto":
+              print(json.dumps(json.loads(inp)))
+              raise SystemExit
+          apis = [30] if mode == "SMOKE" else [30, 34]
+          print(json.dumps({"include": [
+              {"api": a, "abi": "x86_64", "tag": "google_apis"} for a in apis]}))
+          EOF
+          cat matrix.json
+          echo "json=$(tr -d '\n' < matrix.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-under-test
+          path: apk/*.apk
+          retention-days: 7
+          if-no-files-found: error
+
+  emulator-test:
+    name: Autonomous test (API ${{ matrix.api }})
+    needs: build-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-apk.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -al /dev/kvm
+
+      - name: Install system image
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" \
+            "system-images;android-${{ matrix.api }};${{ matrix.tag }};${{ matrix.abi }}" \
+            "platform-tools" "build-tools;34.0.0" "emulator" > /dev/null
+          echo "$SDK/platform-tools"           >> "$GITHUB_PATH"
+          echo "$SDK/build-tools/34.0.0"       >> "$GITHUB_PATH"
+          echo "$SDK/emulator"                 >> "$GITHUB_PATH"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+
+      - name: Create and boot emulator
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd \
+            -n ci -k "system-images;android-${{ matrix.api }};${{ matrix.tag }};${{ matrix.abi }}" \
+            -d pixel_5 --force
+          nohup "$SDK/emulator/emulator" -avd ci -no-window -gpu swiftshader_indirect \
+            -noaudio -no-boot-anim -camera-back none -camera-front none \
+            -memory 3072 -cores 2 -no-snapshot > /tmp/emulator.log 2>&1 &
+          adb wait-for-device
+          timeout 900 bash -c 'while [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" != "1" ]; do sleep 5; done'
+          adb devices -l
+          adb shell settings put global window_animation_scale 0.0 || true
+          adb shell settings put global transition_animation_scale 0.0 || true
+          adb shell settings put global animator_duration_scale 0.0 || true
+          adb shell settings put secure immersive_mode_confirmations confirmed || true
+
+      - name: Download APK under test
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-under-test
+          path: apk
+
+      - name: Prepare Godot rebuild env (auto-fix path)
+        if: ${{ inputs.autofix == true || github.event_name == 'schedule' }}
+        run: |
+          set -e
+          V="${GODOT_VERSION}"
+          curl -L --retry 3 -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_linux.x86_64.zip"
+          curl -L --retry 3 -o /tmp/templates.tpz "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_export_templates.tpz"
+          unzip -o /tmp/godot.zip -d /tmp/godotbin
+          sudo mv /tmp/godotbin/Godot_v${V}-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          mkdir -p ~/.local/share/godot/export_templates/${V}.stable
+          unzip -o /tmp/templates.tpz -d /tmp/tpl
+          mv /tmp/tpl/templates/* ~/.local/share/godot/export_templates/${V}.stable/
+          mkdir -p ~/.android android/build
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" \
+            -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          sed -i "s|keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|; s|keystore/debug_user=\"\"|keystore/debug_user=\"androiddebugkey\"|; s|keystore/debug_password=\"\"|keystore/debug_password=\"android\"|; s|keystore/release=\"\"|keystore/release=\"$HOME/.android/debug.keystore\"|; s|keystore/release_user=\"\"|keystore/release_user=\"androiddebugkey\"|; s|keystore/release_password=\"\"|keystore/release_password=\"android\"|" export_presets.cfg
+          TPLDIR="$HOME/.local/share/godot/export_templates/${V}.stable"
+          unzip -o "$TPLDIR/android_source.zip" -d android/build
+          echo "${V}.stable" > android/.build_version
+          touch android/build/.gdignore
+          godot --headless --import --path "$PWD" || true
+
+      - name: Run universal autonomous test
+        id: test
+        env:
+          BUILD_CMD: godot --headless --export-release Android-x86_64 apk/rebuilt.apk --path "$PWD"
+        run: |
+          MODE="${{ inputs.mode }}"
+          [ -n "$MODE" ] || MODE=SMOKE
+          if [ "${{ github.event_name }}" = "schedule" ]; then MODE=DEEP; fi
+          SEED="${{ inputs.seed }}"
+          [ -n "$SEED" ] || SEED=42
+          SERIAL="$(adb devices | awk 'NR==2{print $1}')"
+          ARGS=(--apk apk --mode "$MODE" --seed "$SEED"
+                --out "artifacts-api${{ matrix.api }}" --serial "$SERIAL")
+          if [ "${{ inputs.autofix }}" = "true" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS+=(--autofix --repo . --apk-dir apk --build-cmd "$BUILD_CMD")
+          fi
+          python3 -m apktester.runner "${ARGS[@]}"
+
+      - name: Push successful fixes to main
+        if: >-
+          ${{ (inputs.push_fixes == true || github.event_name == 'schedule') }}
+        run: |
+          git config user.name "rblox-autofix[bot]"
+          git config user.email "autofix@users.noreply.github.com"
+          git add -A -- ':!apk' ':!artifacts-api*' ':!tools/apk-tester/artifacts*'
+          if git diff --cached --quiet; then
+            echo "no source changes to push"
+          else
+            git commit -m "[autofix] perbaikan otomatis dari universal APK tester (mode ${{ inputs.mode || 'DEEP' }})"
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" HEAD:main
+          fi
+
+      - name: Attach screenshots to release
+        if: ${{ inputs.attach_to_release == true }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          OK=0
+          for f in $(find artifacts-api*/screenshots -name '*.png' 2>/dev/null | head -4); do
+            if command -v identify >/dev/null 2>&1; then
+              C=$(identify -format "%k" "$f" 2>/dev/null || echo 0)
+              if [ "${C:-0}" -ge 16 ]; then cp "$f" release-shot-$OK.png; OK=$((OK+1)); fi
+            fi
+          done
+          if [ "$OK" -gt 0 ]; then
+            gh release upload "${{ inputs.release_tag || 'dev-build' }}" release-shot-*.png --clobber
+            echo "attached $OK screenshot(s) to release"
+          else
+            echo "no non-black screenshots to attach (SwiftShader limitation)"
+          fi
+
+      - name: Upload test artifacts (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apktest-artifacts-api${{ matrix.api }}
+          path: artifacts-api${{ matrix.api }}
+          retention-days: 14
+          if-no-files-found: warn
+
+  release-gate:
+    name: Release gate
+    needs: [build-apk, emulator-test]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Collect artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: apktest-artifacts-*
+          path: gate-artifacts
+          merge-multiple: true
+      - name: Merge gate verdict
+        id: gate
+        run: |
+          mkdir -p gate
+          (python3 -m apktester.reporting gate --root gate-artifacts --out gate) || true
+          if [ ! -f gate/gate.json ]; then
+            echo '{"gate":"DO_NOT_RELEASE","reason":"no gate output"}' > gate/gate.json
+          fi
+          GATE=$(python3 -c "import json;print(json.load(open('gate/gate.json')).get('gate','DO_NOT_RELEASE'))")
+          echo "gate=$GATE" >> "$GITHUB_OUTPUT"
+      - name: Enforce gate
+        run: |
+          if [ "${{ steps.gate.outputs.gate }}" != "RELEASE" ]; then
+            echo "::error::RELEASE GATE = DO_NOT_RELEASE — APK must not be published"
+            cat gate/gate.json
+            exit 1
+          fi
+          echo "RELEASE GATE = RELEASE"
+      - name: Upload gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-report
+          path: gate
+          retention-days: 30

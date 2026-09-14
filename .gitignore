@@ -18,3 +18,8 @@ __pycache__/
 
 # Impor sementara
 user_imports/
+
+# Universal APK tester output (lokal; CI mengunggah sebagai artifact)
+tools/apk-tester/artifacts*/
+tools/apk-tester/gate/
+tools/apk-tester/matrix.json
